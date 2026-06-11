@@ -1,0 +1,40 @@
+---
+description: ACP 프로젝트 Figma 파일 연결 및 디자인-코드 워크플로
+alwaysApply: true
+---
+
+# Figma 연결 (ACP-Project)
+
+## 연결된 파일
+
+- **파일명:** ACP-Project
+- **fileKey:** `bf3epGnFSoh0TJ5huaq4rY`
+- **URL:** https://www.figma.com/design/bf3epGnFSoh0TJ5huaq4rY/ACP-Project
+- **설정:** `figma.config.json`
+
+## 프로젝트 디자인 참조
+
+- 디자인 시스템: `01. 기획/08. DESIGN_SYSTEM.md`
+- UI 목업(PNG): `02. UI 디자인/` (Screen 01–12)
+- Figma 구조(기획): DESIGN_SYSTEM.md §24 Figma Structure
+
+## Figma MCP 워크플로
+
+1. `get_design_context`로 노드 컨텍스트·스크린샷·힌트 조회
+2. 응답이 크면 `get_metadata`로 구조 파악 후 필요한 노드만 재조회
+3. `get_screenshot`으로 시각적 참조 확보
+4. MCP 출력(React+Tailwind)은 참조용 — 프로젝트 컨벤션·토큰에 맞게 변환
+5. 색상·타이포·스페이싱은 DESIGN_SYSTEM.md 토큰 우선 (Primary `#6366F1` 등)
+
+## 디자인 시스템 라이브러리 (Figma 파일에 연결됨)
+
+- Material 3 Design Kit
+- Simple Design System
+- iOS 18 / iOS 26, iPadOS, watchOS, visionOS, macOS UI kits
+
+새 화면·컴포넌트 작업 시 `search_design_system`으로 기존 에셋을 먼저 검색한다.
+
+## URL 파싱
+
+- `node-id=1-2` → `nodeId: "1:2"`
+- node-id 없으면 `get_metadata`만으로 페이지 목록 조회

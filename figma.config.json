@@ -1,0 +1,84 @@
+{
+  "fileKey": "bf3epGnFSoh0TJ5huaq4rY",
+  "fileName": "ACP-Project",
+  "url": "https://www.figma.com/design/bf3epGnFSoh0TJ5huaq4rY/ACP-Project",
+  "project": "AI Character Playground (ACP)",
+  "designSystemDoc": "01. 기획/08. DESIGN_SYSTEM.md",
+  "uiMockups": "02. UI 디자인",
+  "rebuildVersion": "v7-mockup-fidelity",
+  "imagePolicy": "배경은 일러스트만 사용, 모든 텍스트는 Figma Text 레이어로 분리",
+  "viewports": {
+    "desktop": { "width": 1920, "height": 1080, "label": "PC Web" },
+    "mobile": { "width": 360, "height": 800, "label": "Mobile" }
+  },
+  "pages": [
+    { "id": "0:1", "name": "Screens", "role": "reference-mockups" },
+    { "id": "3:2", "name": "Foundations", "role": "design-tokens", "rootNodeId": "86:2" },
+    { "id": "3:3", "name": "Components", "role": "component-library", "rootNodeId": "88:2" },
+    { "id": "3:4", "name": "Screen Builds", "role": "rebuilt-screens" }
+  ],
+  "variables": {
+    "collection": "ACP Tokens",
+    "modes": ["Dark", "Light"]
+  },
+  "assets": {
+    "s01Hero": "e3d9cfab8ed664a5e79c62843332b7d27340fd66",
+    "s02Hero": "323852396f418cd0e2da2a759207592ae66cc99c",
+    "s03Hero": "d420fca9de1a10447a0772e1b4c2b113b875a52f",
+    "s03Char1": "5032060a4f7cb719bbc621df3aebb276fe3fed4d",
+    "s03Char2": "6a8889b168dea9d92d254d63d293d1d893ed9f8d",
+    "s03World1": "c5ad016f35abe30c496d3c775c4a45fb0e62611b",
+    "s04Banner": "834312ee7b28b95ba19c2c37267c32be9f00bf98",
+    "s04Char": "bddb6ca8f70449c66db13140a24d438b7a984c6a",
+    "s04World": "0ddb723a52f2028870df4dec49ef4bbd00d8c6a8",
+    "s05Portrait": "f061dff8a3224243c42ea87b11d13fc505d91292",
+    "s05Gallery1": "4661dac498a1b7409a210b69e2fa6d09d70e0db2",
+    "s05Gallery2": "124b155d09c45b957e33c0065d52e9dca9ceca95",
+    "s06Bg": "23c37ec20011e5b9219bcfb6700dc2fd5deb6283",
+    "s12Hero": "029e7001099ec6ba0548ba52388f1211af3cfb08"
+  },
+  "components": {
+    "Button/Primary": "88:3",
+    "Button/Secondary": "88:4",
+    "Button/Ghost": "88:5",
+    "Button/Social/Google": "88:6",
+    "Button/Social/Apple": "88:7",
+    "Button/Social/Discord": "88:8",
+    "Input/Default": "88:9",
+    "SideNavItem/Active": "88:10",
+    "SideNavItem/Default": "88:11",
+    "CharacterCard/Default": "88:12",
+    "ChatBubble/Character": "88:13",
+    "ChatBubble/User": "88:14",
+    "ChatBubble/Narration": "88:15",
+    "SearchBar/Default": "88:16"
+  },
+  "builtScreens": [
+    { "num": "02", "name": "Login", "nodeId": "103:2", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 0, "y": 0 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "01", "name": "Landing", "nodeId": "122:2", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 2040, "y": 0 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "03", "name": "Home", "nodeId": "121:2", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 0, "y": 1200 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "04", "name": "Character Explore", "nodeId": "123:2", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 2040, "y": 1200 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "05", "name": "Character Detail", "nodeId": "128:2", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 0, "y": 2400 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "06", "name": "RP Chat", "nodeId": "129:2", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 2040, "y": 2400 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "07", "name": "Memory Archive", "nodeId": "131:2", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 0, "y": 3600 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "08", "name": "Relationship Graph", "nodeId": "114:71", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 2040, "y": 3600 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "09", "name": "Emotion Dashboard", "nodeId": "114:111", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 0, "y": 4800 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "10", "name": "Character Studio", "nodeId": "115:2", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 2040, "y": 4800 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "11", "name": "World Studio", "nodeId": "115:44", "viewport": "desktop", "page": "Screen Builds", "position": { "x": 0, "y": 6000 }, "size": { "w": 1920, "h": 1080 } },
+    { "num": "12", "name": "Mobile Design", "nodeId": "132:2", "viewport": "mobile-showcase", "page": "Screen Builds", "position": { "x": 2040, "y": 6000 }, "size": { "w": 1720, "h": 3700 }, "phoneSize": { "w": 360, "h": 800 }, "phones": ["M01 — Home", "M02 — Explore", "M03 — Chat", "M04 — Relationship", "M05 — Memory", "M06 — Emotion", "M07 — Profile", "M08 — My Page"] }
+  ],
+  "screens": [
+    { "num": "01", "name": "랜딩 (스플래시)", "nodeId": "4:5", "mockupUploaded": true, "built": true, "buildNodeId": "122:2", "viewport": "desktop" },
+    { "num": "02", "name": "Login", "nodeId": "4:8", "mockupUploaded": true, "built": true, "buildNodeId": "103:2", "viewport": "desktop" },
+    { "num": "03", "name": "Home", "nodeId": "4:11", "mockupUploaded": true, "built": true, "buildNodeId": "121:2", "viewport": "desktop" },
+    { "num": "04", "name": "Character Explore", "nodeId": "4:14", "mockupUploaded": true, "built": true, "buildNodeId": "123:2", "viewport": "desktop" },
+    { "num": "05", "name": "Character Detail", "nodeId": "4:17", "mockupUploaded": true, "built": true, "buildNodeId": "128:2", "viewport": "desktop" },
+    { "num": "06", "name": "RP 채팅", "nodeId": "4:20", "mockupUploaded": true, "built": true, "buildNodeId": "129:2", "viewport": "desktop" },
+    { "num": "07", "name": "Memory Archive", "nodeId": "4:23", "mockupUploaded": true, "built": true, "buildNodeId": "131:2", "viewport": "desktop" },
+    { "num": "08", "name": "Relationship Graph", "nodeId": "4:26", "mockupUploaded": true, "built": true, "buildNodeId": "114:71", "viewport": "desktop" },
+    { "num": "09", "name": "Emotion Dashboard", "nodeId": "4:29", "mockupUploaded": true, "built": true, "buildNodeId": "114:111", "viewport": "desktop" },
+    { "num": "10", "name": "캐릭터 스튜디오", "nodeId": "4:32", "mockupUploaded": true, "built": true, "buildNodeId": "115:2", "viewport": "desktop" },
+    { "num": "11", "name": "World Studio", "nodeId": "4:35", "mockupUploaded": true, "built": true, "buildNodeId": "115:44", "viewport": "desktop" },
+    { "num": "12", "name": "Mobile Design", "nodeId": "4:38", "mockupUploaded": true, "built": true, "buildNodeId": "132:2", "viewport": "mobile" }
+  ]
+}
