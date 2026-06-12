@@ -12,15 +12,26 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = Path("/tmp/acp-assets")
 OUT.mkdir(exist_ok=True)
 
+
+def ui_design_dir() -> Path:
+    for d in ROOT.iterdir():
+        if d.is_dir() and d.name.startswith("02."):
+            return d
+    raise FileNotFoundError("02. UI design folder not found")
+
+
+MOCKUP_DIR = ui_design_dir() / "mockup"
+
 # (filename_pattern, output_name, crop_box)  crop_box = (left, top, right, bottom)
 CROPS: list[tuple[str, str, tuple[int, int, int, int]]] = [
-    ("Screen 01 - 랜딩(스플래시).png", "s01-hero.png", (0, 0, 950, 1024)),
-    ("Screen 02 - Login.png", "s02-hero.png", (0, 80, 680, 1050)),
-    ("Screen 03 - Home (홈 화면).png", "s03-hero.png", (680, 130, 1040, 310)),
-    ("Screen 03 - Home (홈 화면).png", "s03-char1.png", (248, 418, 378, 598)),
-    ("Screen 03 - Home (홈 화면).png", "s03-char2.png", (388, 418, 518, 598)),
-    ("Screen 03 - Home (홈 화면).png", "s03-world1.png", (248, 668, 418, 788)),
-    ("Screen 03 - Home (홈 화면).png", "s03-world2.png", (428, 668, 598, 788)),
+    ("Screen 01 - 랜딩(스플래시).png", "s01-hero.png", (0, 0, 1020, 1024)),
+    ("Screen 02 - Login.png", "s02-hero.png", (0, 72, 620, 1180)),
+    ("Screen 03 - Home (홈 화면).png", "s03-hero.png", (248, 128, 1052, 388)),
+    ("Screen 03 - Home (홈 화면).png", "s03-char1.png", (258, 418, 388, 608)),
+    ("Screen 03 - Home (홈 화면).png", "s03-char2.png", (398, 418, 528, 608)),
+    ("Screen 03 - Home (홈 화면).png", "s03-char3.png", (538, 418, 668, 608)),
+    ("Screen 03 - Home (홈 화면).png", "s03-world1.png", (258, 668, 428, 798)),
+    ("Screen 03 - Home (홈 화면).png", "s03-world2.png", (438, 668, 608, 798)),
     ("Screen 04 - Character Explore*.png", "s04-banner.png", (300, 130, 1200, 320)),
     ("Screen 05 - Character Detail*.png", "s05-portrait.png", (248, 108, 418, 548)),
     ("Screen 05 - Character Detail*.png", "s05-gallery1.png", (248, 1080, 498, 1180)),
@@ -34,13 +45,14 @@ CROPS: list[tuple[str, str, tuple[int, int, int, int]]] = [
 
 
 def find_file(pattern: str) -> Path:
-    matches = glob.glob(str(ROOT / "02. UI 디자인" / pattern))
+    matches = glob.glob(str(MOCKUP_DIR / pattern))
     if not matches:
-        raise FileNotFoundError(pattern)
+        raise FileNotFoundError(f"{pattern} (in {MOCKUP_DIR})")
     return Path(matches[0])
 
 
 def main() -> None:
+    print(f"Mockup dir: {MOCKUP_DIR}")
     for pattern, out_name, box in CROPS:
         src = find_file(pattern)
         img = Image.open(src).convert("RGBA")

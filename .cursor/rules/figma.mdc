@@ -15,8 +15,12 @@ alwaysApply: true
 ## 프로젝트 디자인 참조
 
 - 디자인 시스템: `01. 기획/08. DESIGN_SYSTEM.md`
-- UI 목업(PNG): `02. UI 디자인/` (Screen 01–12)
-- Figma 구조(기획): DESIGN_SYSTEM.md §24 Figma Structure
+- UI 화면 목업: `02. UI 디자인/mockup/` (Screen 01–12)
+- UI 디자인 팩: `02. UI 디자인/pack/` (토큰·컴포넌트·도메인, 23 packs)
+- 에셋 인덱스: `01. 기획/12. UI_ASSETS.md`
+- Figma 구조: DESIGN_SYSTEM.md §24
+- Pack References (Figma): `Pack References` 페이지 · `figma.config.json` → `packReferences`
+- 에셋 폴더 규칙: `.cursor/rules/design-assets.mdc`
 
 ## Figma MCP 워크플로
 

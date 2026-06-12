@@ -1,0 +1,47 @@
+---
+description: ACP UI mockup·pack 에셋 폴더 규칙 및 Figma 연동
+globs: 02. UI 디자인/**,01. 기획/12.*,figma.config.json,scripts/crop-mockup-assets.py
+alwaysApply: false
+---
+
+# UI 디자인 에셋 규칙 (ACP)
+
+## 폴더 역할 (엄격 분리)
+
+| 경로 | 내용 | 용도 |
+|------|------|------|
+| `02. UI 디자인/mockup/` | Screen 01–12 화면 PNG | Figma Screens·Screen Builds 좌표 참조 |
+| `02. UI 디자인/pack/` | 23개 디자인 팩 PNG | Figma Foundations·Components 구축 참조 |
+
+- 루트 `02. UI 디자인/`에 PNG를 직접 두지 않는다.
+- mockup ≠ pack. 서로 다른 폴더에만 저장한다.
+
+## 작업 시 참조 순서
+
+1. `01. 기획/12. UI_ASSETS.md` — 파일 인덱스·Figma nodeId
+2. `01. 기획/08. DESIGN_SYSTEM.md` — 토큰·타이포·컴포넌트 스펙
+3. `figma.config.json` — Figma fileKey·buildNodeId·에셋 해시
+4. `.cursor/rules/figma.mdc` — Figma MCP 워크플로
+
+## Mockup 작업
+
+- 파일명: `Screen NN - {화면명}.png`
+- Figma 재구축: 일러스트만 IMAGE, 텍스트는 Text 레이어 (`imagePolicy`)
+- PC: 1920×1080, Mobile 폰: 360×800
+- 일러스트 크롭: `python3 scripts/crop-mockup-assets.py` (입력: `mockup/`)
+
+## Pack 작업
+
+- 파일명: `NN. {category}_pack.png`
+- Pack PNG를 코드에 베이크하지 말고 토큰·컴포넌트로 재구성
+- Figma **Pack References** 페이지 (`figma.config.json` → `packReferences`)에 23팩 참조 그리드 유지
+- Foundations ← pack 01–06, 23 / Components ← pack 07, 10, 13
+- 도메인 UI ← pack 08–09, 11–22 (화면별 매핑은 `12. UI_ASSETS.md` §3.3)
+- 팩 재업로드: `scripts/upload-packs-to-figma.py` + MCP `upload_assets`
+
+## 에셋 추가·변경 체크리스트
+
+- [ ] 올바른 하위 폴더(`mockup/` 또는 `pack/`)에 저장
+- [ ] `12. UI_ASSETS.md` 테이블 갱신
+- [ ] Figma 반영 시 `figma.config.json` 갱신
+- [ ] Phase 영향 있으면 `00. PROJECT_ALIGNMENT.md` §8 확인
