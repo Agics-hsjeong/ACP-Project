@@ -7,7 +7,7 @@
   "uiAssetsDoc": "01. 기획/12. UI_ASSETS.md",
   "uiMockups": "02. UI 디자인/mockup",
   "uiPacks": "02. UI 디자인/pack",
-  "rebuildVersion": "v12.3-pack-references",
+  "rebuildVersion": "v13-foundations-pack",
   "typography": {
     "target": "Pretendard",
     "figmaFallback": "Noto Sans KR",
@@ -20,7 +20,7 @@
   },
   "pages": [
     { "id": "0:1", "name": "Screens", "role": "reference-mockups" },
-    { "id": "3:2", "name": "Foundations", "role": "design-tokens", "rootNodeId": "86:2" },
+    { "id": "3:2", "name": "Foundations", "role": "design-tokens", "rootNodeId": "279:2", "version": "v13-foundations-pack", "packRefs": ["01", "02", "03", "04", "05", "06", "23"] },
     { "id": "3:3", "name": "Components", "role": "component-library", "rootNodeId": "88:2" },
     { "id": "3:4", "name": "Screen Builds", "role": "rebuilt-screens" },
     { "id": "232:2", "name": "Pack References", "role": "pack-references", "rootNodeId": "232:3" }
@@ -57,7 +57,10 @@
   },
   "variables": {
     "collection": "ACP Tokens",
-    "modes": ["Dark", "Light"]
+    "collectionId": "VariableCollectionId:3:5",
+    "modes": ["Dark", "Light"],
+    "count": 28,
+    "groups": ["color/bg/*", "color/border/*", "color/text/*", "color/brand/*", "color/primary/*", "color/semantic/*", "color/accent/*"]
   },
   "assets": {
     "s01Hero": "db40491b711a0083b6ad8a6bf862ab836270a0a8",
