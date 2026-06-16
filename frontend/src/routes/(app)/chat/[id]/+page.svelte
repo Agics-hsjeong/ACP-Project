@@ -1,7 +1,14 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { getCharacter } from '$lib/data/mock';
-	import { getChatMessages, sendChatMessage, isCharacterReplying } from '$lib/stores/chat.svelte';
+	import { getCatalogCharacter } from '$lib/stores/catalog.svelte';
+	import {
+		getChatMessages,
+		sendChatMessage,
+		isCharacterReplying,
+		loadChatHistory,
+		initChatApi
+	} from '$lib/stores/chat.svelte';
 	import { autoscroll } from '$lib/actions/autoscroll';
 	import ChatBubble from '$lib/components/chat/ChatBubble.svelte';
 	import ChatSessionPanel from '$lib/components/chat/ChatSessionPanel.svelte';
@@ -10,8 +17,14 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Send, Bookmark, MoreHorizontal, Heart } from 'lucide-svelte';
 
-	const character = $derived(getCharacter($page.params.id) ?? getCharacter('elia')!);
+	const characterId = $derived($page.params.id ?? 'elia');
+	const character = $derived(getCatalogCharacter(characterId) ?? getCatalogCharacter('elia')!);
 	let input = $state('');
+
+	onMount(() => {
+		void initChatApi();
+		void loadChatHistory(characterId);
+	});
 
 	const messages = $derived(getChatMessages(character.id));
 	const replying = $derived(isCharacterReplying(character.id));

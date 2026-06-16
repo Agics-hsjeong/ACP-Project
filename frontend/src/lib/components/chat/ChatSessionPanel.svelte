@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { Plus } from 'lucide-svelte';
-	import { recentChats, memoryFragments } from '$lib/data/mock';
+	import {
+		getCatalogRecentChats,
+		getMemoryFragments
+	} from '$lib/stores/catalog.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 
 	interface Props {
@@ -9,6 +12,9 @@
 	}
 
 	let { activeId }: Props = $props();
+
+	const recentChats = $derived(getCatalogRecentChats());
+	const memoryFragments = $derived(getMemoryFragments());
 </script>
 
 <aside class="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-bg-surface/30 lg:flex">
@@ -31,7 +37,7 @@
 						: 'hover:bg-white/5'}"
 				>
 					<img
-						src="https://api.dicebear.com/9.x/notionists/svg?seed={chat.id}"
+						src={chat.avatar || `https://api.dicebear.com/9.x/notionists/svg?seed=${chat.id}`}
 						alt=""
 						class="h-9 w-9 rounded-full bg-bg-card"
 					/>

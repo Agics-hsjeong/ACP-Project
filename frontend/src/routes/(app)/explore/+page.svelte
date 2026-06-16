@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import CharacterCard from '$lib/components/cards/CharacterCard.svelte';
 	import WorldCard from '$lib/components/cards/WorldCard.svelte';
 	import ExploreFilterPanel from '$lib/components/explore/ExploreFilterPanel.svelte';
 	import SectionHeader from '$lib/components/ui/SectionHeader.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { characters, worlds, exploreGenres } from '$lib/data/mock';
+	import { getCatalogCharacters, getCatalogWorlds } from '$lib/stores/catalog.svelte';
+	import { getExploreGenres } from '$lib/stores/meta.svelte';
+	import { getSearchQuery } from '$lib/stores/search.svelte';
 	import { Shuffle } from 'lucide-svelte';
 
 	let genre = $state('전체');
@@ -12,8 +15,25 @@
 	let gender = $state('all');
 	let selectedTags = $state<string[]>([]);
 
+	const urlQuery = $derived($page.url.searchParams.get('q') ?? getSearchQuery());
+
+	const catalogCharacters = $derived(getCatalogCharacters());
+	const catalogWorlds = $derived(getCatalogWorlds());
+	const exploreGenres = $derived(getExploreGenres());
+
 	const filtered = $derived.by(() => {
-		let list = [...characters];
+		let list = [...catalogCharacters];
+
+		if (urlQuery) {
+			const q = urlQuery.toLowerCase();
+			list = list.filter(
+				(c) =>
+					c.name.toLowerCase().includes(q) ||
+					c.description.toLowerCase().includes(q) ||
+					c.world.toLowerCase().includes(q) ||
+					c.tags.some((t) => t.toLowerCase().includes(q))
+			);
+		}
 
 		if (genre !== '전체') {
 			list = list.filter(
@@ -45,7 +65,7 @@
 		return list;
 	});
 
-	const rising = $derived([...characters].sort((a, b) => b.likes - a.likes).slice(0, 4));
+	const rising = $derived([...catalogCharacters].sort((a, b) => b.likes - a.likes).slice(0, 4));
 </script>
 
 <svelte:head>
@@ -119,7 +139,7 @@
 		<section class="mb-8">
 			<SectionHeader title="인기 세계관" href="/explore" />
 			<div class="flex gap-4 overflow-x-auto pb-2">
-				{#each worlds as world}
+				{#each catalogWorlds as world}
 					<WorldCard {world} />
 				{/each}
 			</div>

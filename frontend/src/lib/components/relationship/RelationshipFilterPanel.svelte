@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { RelationType } from '$lib/data/relationship';
-	import { edgeStyles, worlds } from '$lib/data/relationship';
+	import { edgeStyles } from '$lib/data/relationship';
+	import { getRelationshipGraph } from '$lib/stores/relationship.svelte';
 
 	interface Props {
 		worldId?: string;
@@ -13,7 +14,7 @@
 	}
 
 	let {
-		worldId = $bindable('arcadia'),
+		worldId = $bindable(''),
 		showCharacters = $bindable(true),
 		showPlaces = $bindable(true),
 		showFactions = $bindable(true),
@@ -29,6 +30,12 @@
 		] as RelationType[]),
 		onreset
 	}: Props = $props();
+
+	const worlds = $derived(getRelationshipGraph().worlds ?? []);
+
+	$effect(() => {
+		if (!worldId && worlds.length) worldId = worlds[0].id;
+	});
 
 	const typeFilters: RelationType[] = [
 		'lover',

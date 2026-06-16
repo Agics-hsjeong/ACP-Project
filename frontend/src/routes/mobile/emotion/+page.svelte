@@ -2,7 +2,10 @@
 	import EmotionRadar from '$lib/components/emotion/EmotionRadar.svelte';
 	import EmotionTrendChart from '$lib/components/emotion/EmotionTrendChart.svelte';
 	import EmotionBars from '$lib/components/emotion/EmotionBars.svelte';
-	import { emotions, emotionTrend } from '$lib/data/mock';
+	import { getEmotions, getEmotionTrend } from '$lib/stores/emotion.svelte';
+
+	const emotions = $derived(getEmotions());
+	const emotionTrend = $derived(getEmotionTrend());
 </script>
 
 <svelte:head>

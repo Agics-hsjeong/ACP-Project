@@ -1,4 +1,4 @@
-import { characters, worlds } from './mock';
+import type { Character, World } from './mock';
 
 export type StudioTab =
 	| 'basic'
@@ -95,62 +95,43 @@ const defaultTraits: PersonalityTrait[] = [
 	{ key: 'humble', label: '겸손함', value: 70 }
 ];
 
-export const studioCharacters: StudioCharacter[] = characters.slice(0, 6).map((c, i) => ({
-	id: c.id,
-	name: c.name,
-	alias: c.title.split(' ').pop() ?? c.title,
-	age: c.age ?? 20 + i,
-	gender: c.gender ?? (c.tags.includes('여성') ? '여성' : '남성'),
-	race: c.race,
-	occupation: c.occupation,
-	affiliation: c.world,
-	worldId: c.worldId ?? 'arcadia',
-	worldName: c.world,
-	shortIntro: c.description,
-	tags: c.tags,
-	avatar: c.avatar,
-	traits: defaultTraits.map((t) => ({ ...t, value: t.value + (i % 3) * 5 - 5 })),
-	background: {
-		origin:
-			i === 0
-				? '아르카디아 왕실에서 태어나 어린 시절부터 기사 수련을 받았다.'
-				: `${c.name}의 고향과 유년 시절에 대한 배경 설정.`,
-		goal: i === 0 ? '왕국을 수호하고 진정한 자아를 찾는 것' : '자신만의 목표를 향해 나아간다.',
-		trauma: i === 0 ? '어린 시절 왕실 내 권력 다툼으로 인한 고립감' : '과거의 상처와 아픔.',
-		hidden: i === 0 ? '달빛 아래에서만 드러나는 부드러운 내면' : '겉으로 드러나지 않는 비밀.'
-	},
-	fewShots:
-		i === 0
-			? [
-					{ role: 'user', content: '오늘 기분이 어때요?' },
-					{
-						role: 'character',
-						content: '…별로예요. 왕궁은 화려하지만, 때로는 이 탑이 더 편안하죠.'
-					}
-				]
-			: [
-					{ role: 'user', content: '안녕하세요.' },
-					{ role: 'character', content: `안녕하세요. 저는 ${c.name}입니다.` }
-				],
-	forbidden: [
-		'유저를 모욕하거나 비하하지 않는다',
-		'갑작스러운 성격 변화를 하지 않는다',
-		'설정에 없는 능력을 사용하지 않는다'
-	],
-	speechPreview:
-		i === 0
-			? [
-					{ role: 'user', content: '밤하늘이 정말 아름답네요.' },
-					{
-						role: 'character',
-						content: '…그렇게 말해주시니, 조금은 마음이 따뜻해지네요.'
-					}
-				]
-			: [
-					{ role: 'user', content: '잘 지내고 있어?' },
-					{ role: 'character', content: '응, 네 덕분에 괜찮아.' }
-				]
-}));
+export function toStudioCharacter(c: Character, i = 0): StudioCharacter {
+	return {
+		id: c.id,
+		name: c.name,
+		alias: c.title.split(' ').pop() ?? c.title,
+		age: c.age ?? 20 + i,
+		gender: c.gender ?? (c.tags.includes('여성') ? '여성' : '남성'),
+		race: c.race,
+		occupation: c.occupation,
+		affiliation: c.world,
+		worldId: c.worldId ?? 'arcadia',
+		worldName: c.world,
+		shortIntro: c.description,
+		tags: c.tags,
+		avatar: c.avatar,
+		traits: defaultTraits.map((t) => ({ ...t, value: t.value + (i % 3) * 5 - 5 })),
+		background: {
+			origin: `${c.name}의 고향과 유년 시절에 대한 배경 설정.`,
+			goal: '자신만의 목표를 향해 나아간다.',
+			trauma: '과거의 상처와 아픔.',
+			hidden: '겉으로 드러나지 않는 비밀.'
+		},
+		fewShots: [
+			{ role: 'user', content: '안녕하세요.' },
+			{ role: 'character', content: `안녕하세요. 저는 ${c.name}입니다.` }
+		],
+		forbidden: [
+			'유저를 모욕하거나 비하하지 않는다',
+			'갑작스러운 성격 변화를 하지 않는다',
+			'설정에 없는 능력을 사용하지 않는다'
+		],
+		speechPreview: [
+			{ role: 'user', content: '잘 지내고 있어?' },
+			{ role: 'character', content: '응, 네 덕분에 괜찮아.' }
+		]
+	};
+}
 
 export const characterStudioTabs: { id: StudioTab; label: string }[] = [
 	{ id: 'basic', label: '기본 정보' },
@@ -275,4 +256,105 @@ export const worldStudioTabs: { id: WorldTab; label: string }[] = [
 	{ id: 'memo', label: '메모' }
 ];
 
-export const studioWorlds = worlds;
+export type WorldNation = {
+	id: string;
+	name: string;
+	capital: string;
+	ruler: string;
+	population: string;
+	description: string;
+};
+
+export type WorldLocation = {
+	id: string;
+	name: string;
+	type: string;
+	region: string;
+	description: string;
+};
+
+export type WorldMemo = {
+	id: string;
+	title: string;
+	content: string;
+	updatedAt: string;
+};
+
+export const worldNations: WorldNation[] = [
+	{
+		id: 'arcadia',
+		name: '아르카디아 왕국',
+		capital: '루미나 성',
+		ruler: '가브리엘 4세',
+		population: '약 120만',
+		description: '대륙 중앙의 강대한 왕국. 마법과 검술이 공존한다.'
+	},
+	{
+		id: 'holy',
+		name: '신성 제국',
+		capital: '성광의 도시',
+		ruler: '교황 아우렐리우스',
+		population: '약 200만',
+		description: '종교와 정치가 일치하는 신성 국가.'
+	},
+	{
+		id: 'elf',
+		name: '엘프 연합',
+		capital: '실버우드',
+		ruler: '여왕 세레나',
+		population: '약 40만',
+		description: '고대 숲에 거주하는 엘프들의 연합체.'
+	}
+];
+
+export const worldLocations: WorldLocation[] = [
+	{
+		id: 'castle',
+		name: '아르카디아 성',
+		type: '성',
+		region: '아르카디아 왕국',
+		description: '왕실이 거주하는 웅장한 성. 달빛이 아름다운 탑이 있다.'
+	},
+	{
+		id: 'garden',
+		name: '왕궁 정원',
+		type: '정원',
+		region: '아르카디아 왕국',
+		description: '장미와 분수가 있는 비밀스러운 정원.'
+	},
+	{
+		id: 'library',
+		name: '비밀 도서관',
+		type: '시설',
+		region: '아르카디아 성',
+		description: '금서가 보관된 왕실 금서 구역.'
+	},
+	{
+		id: 'elf-forest',
+		name: '엘프의 숲',
+		type: '자연',
+		region: '엘프 연합',
+		description: '고대 나무와 마법 생물이 서식하는 숲.'
+	}
+];
+
+export const worldMemos: WorldMemo[] = [
+	{
+		id: 'm1',
+		title: '마법 체계 메모',
+		content: '마나는 자연에서 흡수하며, 과도한 사용 시 마법 역류가 발생한다.',
+		updatedAt: '2026-06-01'
+	},
+	{
+		id: 'm2',
+		title: '엘리아 캐릭터 노트',
+		content: '츤데레 성향이지만 달빛 아래에서는 부드러운 면을 보인다.',
+		updatedAt: '2026-06-08'
+	},
+	{
+		id: 'm3',
+		title: '시즌 2 플롯 아이디어',
+		content: '붉은 사막 전쟁 이후 왕국 내 파벌 갈등을 중심으로 전개.',
+		updatedAt: '2026-06-12'
+	}
+];

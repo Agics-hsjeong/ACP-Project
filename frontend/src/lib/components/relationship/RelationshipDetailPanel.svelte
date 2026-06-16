@@ -1,11 +1,11 @@
 <script lang="ts">
+	import { edgeStyles } from '$lib/data/relationship';
 	import {
-		getNode,
-		getEdgesForNode,
-		eliaRelationships,
-		relationshipHistory,
-		edgeStyles
-	} from '$lib/data/relationship';
+		getRelationshipNode,
+		getRelationshipEdgesForNode,
+		getEliaRelationships,
+		getRelationshipHistory
+	} from '$lib/stores/relationship.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { MessageCircle } from 'lucide-svelte';
@@ -16,8 +16,10 @@
 
 	let { nodeId }: Props = $props();
 
-	const node = $derived(getNode(nodeId));
-	const edges = $derived(getEdgesForNode(nodeId));
+	const node = $derived(getRelationshipNode(nodeId));
+	const edges = $derived(getRelationshipEdgesForNode(nodeId));
+	const eliaRelationships = $derived(getEliaRelationships());
+	const relationshipHistory = $derived(getRelationshipHistory());
 	const isElia = $derived(nodeId === 'elia');
 </script>
 
@@ -85,8 +87,8 @@
 						{#each edges as edge}
 							{@const other =
 								edge.source === nodeId
-									? getNode(edge.target)?.label
-									: getNode(edge.source)?.label}
+									? getRelationshipNode(edge.target)?.label
+									: getRelationshipNode(edge.source)?.label}
 							<li class="flex items-center gap-2 text-text-secondary">
 								<span class="h-2 w-2 rounded-full" style="background:{edgeStyles[edge.type].color}"></span>
 								{other} — {edge.label}

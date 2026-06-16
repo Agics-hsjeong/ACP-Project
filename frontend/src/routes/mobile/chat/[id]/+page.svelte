@@ -1,16 +1,29 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { tick } from 'svelte';
-	import { getCharacter } from '$lib/data/mock';
-	import { getChatMessages, sendChatMessage, isCharacterReplying } from '$lib/stores/chat.svelte';
+	import { getCatalogCharacter } from '$lib/stores/catalog.svelte';
+	import {
+		getChatMessages,
+		sendChatMessage,
+		isCharacterReplying,
+		loadChatHistory,
+		initChatApi
+	} from '$lib/stores/chat.svelte';
 	import { autoscroll } from '$lib/actions/autoscroll';
 	import ChatBubble from '$lib/components/chat/ChatBubble.svelte';
 	import ChatInteractionBar from '$lib/components/chat/ChatInteractionBar.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Send } from 'lucide-svelte';
 
-	const character = $derived(getCharacter($page.params.id) ?? getCharacter('elia')!);
+	const characterId = $derived($page.params.id ?? 'elia');
+	const character = $derived(getCatalogCharacter(characterId) ?? getCatalogCharacter('elia')!);
 	let input = $state('');
+
+	onMount(() => {
+		void initChatApi();
+		void loadChatHistory(characterId);
+	});
 	const messages = $derived(getChatMessages(character.id));
 	const replying = $derived(isCharacterReplying(character.id));
 </script>

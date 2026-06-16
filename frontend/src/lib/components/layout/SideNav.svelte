@@ -13,7 +13,7 @@
 		Sparkles,
 		User
 	} from 'lucide-svelte';
-	import { recentChats } from '$lib/data/mock';
+	import { getCatalogRecentChats } from '$lib/stores/catalog.svelte';
 
 	const navItems = [
 		{ href: '/home', label: '홈', icon: Home },
@@ -22,16 +22,18 @@
 		{ href: '/memory', label: '기억 보관소', icon: Brain },
 		{ href: '/relationship', label: '인물 관계도', icon: GitBranch },
 		{ href: '/emotion', label: '감정 분석', icon: Heart },
-		{ href: '/studio/character', label: '캐릭터 스튜디오', icon: Palette, phase: 2 },
-		{ href: '/studio/world', label: '세계관 스튜디오', icon: Globe, phase: 2 },
+		{ href: '/studio/character', label: '캐릭터 스튜디오', icon: Palette },
+		{ href: '/studio/world', label: '세계관 스튜디오', icon: Globe },
 		{ href: '/settings', label: '설정', icon: Settings },
 		{ href: '/mypage', label: '마이페이지', icon: User, match: '/mypage' }
 	];
+
+	const recentChats = $derived(getCatalogRecentChats());
 </script>
 
 <aside class="flex h-screen w-64 shrink-0 flex-col border-r border-white/10 bg-bg-surface/50">
 	<a href="/home" class="flex items-center gap-2 border-b border-white/10 px-5 py-4">
-		<Sparkles class="h-5 w-5 text-primary-400" />
+		<img src="/logo.svg" alt="ACP 로고" class="h-10 w-10 rounded-lg bg-white/5 object-contain" />
 		<div class="leading-tight">
 			<p class="text-sm font-semibold">AI Character</p>
 			<p class="text-[10px] tracking-widest text-text-muted">PLAYGROUND</p>
@@ -51,9 +53,6 @@
 			>
 				<item.icon class="h-4 w-4 shrink-0" />
 				<span class="flex-1">{item.label}</span>
-				{#if item.phase}
-					<span class="text-[10px] text-text-muted">P{item.phase}</span>
-				{/if}
 			</a>
 		{/each}
 	</nav>

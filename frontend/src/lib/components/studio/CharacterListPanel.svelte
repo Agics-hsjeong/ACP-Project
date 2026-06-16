@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { StudioCharacter } from '$lib/data/studio';
+	import type { Character } from '$lib/data/mock';
 	import { Plus, Search } from 'lucide-svelte';
 
 	interface Props {
-		characters: StudioCharacter[];
+		characters: Character[];
 		selectedId: string;
 		onselect: (id: string) => void;
 	}
@@ -16,8 +16,8 @@
 			(c) =>
 				!query ||
 				c.name.includes(query) ||
-				c.worldName.includes(query) ||
-				c.alias.includes(query)
+				c.world.includes(query) ||
+				c.title.includes(query)
 		)
 	);
 </script>

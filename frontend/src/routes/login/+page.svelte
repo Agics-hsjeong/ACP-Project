@@ -1,10 +1,59 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
-	import { Sparkles, Shield, Brain, Globe } from 'lucide-svelte';
+	import { loginWithApi, loginWithGoogle } from '$lib/stores/auth.svelte';
+	import { isFirebaseConfigured } from '$lib/firebase/client';
+	import { Shield, Brain, Globe } from 'lucide-svelte';
 
 	let tab = $state<'email' | 'phone'>('email');
 	let showPassword = $state(false);
+	let email = $state('');
+	let password = $state('');
+	let phone = $state('');
+	let mode = $state<'login' | 'signup'>('login');
+	let googleLoading = $state(false);
+	let authError = $state('');
+
+	const firebaseReady = isFirebaseConfigured();
+
+	const bgImage =
+		'https://api.dicebear.com/9.x/shapes/svg?seed=login-bg&backgroundColor=0f172a&scale=120';
+
+	async function handleLogin(e: Event) {
+		e.preventDefault();
+		authError = '';
+		try {
+			if (tab === 'email') await loginWithApi(email || 'user@acp.local', password);
+			else await loginWithApi(phone || '010-user@acp.local');
+			goto('/home');
+		} catch (err) {
+			authError = err instanceof Error ? err.message : '로그인에 실패했습니다.';
+		}
+	}
+
+	async function handleGoogleLogin() {
+		authError = '';
+		googleLoading = true;
+		try {
+			await loginWithGoogle();
+			goto('/home');
+		} catch (err) {
+			authError = err instanceof Error ? err.message : 'Google 로그인에 실패했습니다.';
+		} finally {
+			googleLoading = false;
+		}
+	}
+
+	async function handleSocial(provider: string) {
+		authError = '';
+		try {
+			await loginWithApi('', undefined, provider);
+			goto('/home');
+		} catch (err) {
+			authError = err instanceof Error ? err.message : '소셜 로그인에 실패했습니다.';
+		}
+	}
 </script>
 
 <svelte:head>
@@ -12,12 +61,12 @@
 </svelte:head>
 
 <div class="relative min-h-screen">
-	<img src="/images/login-bg.png" alt="" class="absolute inset-0 h-full w-full object-cover" />
+	<img src={bgImage} alt="" class="absolute inset-0 h-full w-full object-cover opacity-40" />
 	<div class="absolute inset-0 bg-bg-primary/75 backdrop-blur-[2px]"></div>
 
 	<header class="relative z-10 flex items-center justify-between px-8 py-5">
 		<a href="/landing" class="flex items-center gap-2">
-			<Sparkles class="h-5 w-5 text-primary-400" />
+			<img src="/logo.svg" alt="ACP 로고" class="h-10 w-10 rounded-lg bg-white/5 object-contain" />
 			<span class="font-semibold">AI Character Playground</span>
 		</a>
 		<button class="rounded-lg border border-white/20 px-3 py-1.5 text-sm text-text-secondary">
@@ -36,7 +85,7 @@
 		</div>
 
 		<div class="glass rounded-2xl p-8 shadow-xl">
-			<h2 class="text-2xl font-bold">로그인</h2>
+			<h2 class="text-2xl font-bold">{mode === 'login' ? '로그인' : '회원가입'}</h2>
 			<p class="mt-1 text-sm text-text-muted">AI Character Playground에 오신 것을 환영합니다</p>
 
 			<div class="mt-6 flex rounded-xl bg-bg-primary/50 p-1">
@@ -58,14 +107,15 @@
 				</button>
 			</div>
 
-			<form class="mt-6 space-y-4" onsubmit={(e) => e.preventDefault()}>
+			<form class="mt-6 space-y-4" onsubmit={handleLogin}>
 				{#if tab === 'email'}
-					<Input label="이메일" type="email" placeholder="이메일 주소를 입력하세요" />
+					<Input label="이메일" type="email" placeholder="이메일 주소를 입력하세요" bind:value={email} />
 					<div class="relative">
 						<Input
 							label="비밀번호"
 							type={showPassword ? 'text' : 'password'}
 							placeholder="비밀번호를 입력하세요"
+							bind:value={password}
 						/>
 						<button
 							type="button"
@@ -76,7 +126,7 @@
 						</button>
 					</div>
 				{:else}
-					<Input label="휴대폰 번호" type="tel" placeholder="010-0000-0000" />
+					<Input label="휴대폰 번호" type="tel" placeholder="010-0000-0000" bind:value={phone} />
 					<Input label="인증번호" placeholder="인증번호 6자리" />
 				{/if}
 
@@ -88,8 +138,14 @@
 					<span class="cursor-pointer text-primary-400 hover:underline">비밀번호 찾기</span>
 				</div>
 
-				<Button href="/home" fullWidth size="lg">로그인</Button>
+				<Button type="submit" fullWidth size="lg">{mode === 'login' ? '로그인' : '가입하기'}</Button>
 			</form>
+
+			{#if authError}
+				<p class="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+					{authError}
+				</p>
+			{/if}
 
 			<div class="my-6 flex items-center gap-3 text-xs text-text-muted">
 				<span class="h-px flex-1 bg-white/10"></span>
@@ -98,14 +154,32 @@
 			</div>
 
 			<div class="space-y-2">
-				<Button variant="social-google" fullWidth>Google로 계속하기</Button>
-				<Button variant="social-apple" fullWidth>Apple로 계속하기</Button>
-				<Button variant="social-discord" fullWidth>Discord로 계속하기</Button>
+				<Button
+					variant="social-google"
+					fullWidth
+					disabled={!firebaseReady || googleLoading}
+					onclick={handleGoogleLogin}
+				>
+					{googleLoading ? 'Google 로그인 중…' : 'Google로 계속하기'}
+				</Button>
+				{#if !firebaseReady}
+					<p class="text-center text-xs text-amber-400/90">
+						Google 로그인: Firebase 설정(PUBLIC_FIREBASE_*)이 필요합니다.
+					</p>
+				{/if}
+				<Button variant="social-apple" fullWidth onclick={() => handleSocial('apple')}>Apple로 계속하기</Button>
+				<Button variant="social-discord" fullWidth onclick={() => handleSocial('discord')}>Discord로 계속하기</Button>
 			</div>
 
 			<p class="mt-6 text-center text-sm text-text-muted">
-				계정이 없으신가요?
-				<span class="cursor-pointer text-primary-400 hover:underline">회원가입</span>
+				{mode === 'login' ? '계정이 없으신가요?' : '이미 계정이 있으신가요?'}
+				<button
+					type="button"
+					class="text-primary-400 hover:underline"
+					onclick={() => (mode = mode === 'login' ? 'signup' : 'login')}
+				>
+					{mode === 'login' ? '회원가입' : '로그인'}
+				</button>
 			</p>
 		</div>
 	</main>

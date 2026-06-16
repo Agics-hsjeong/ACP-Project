@@ -3,7 +3,13 @@
 	import EmotionTrendChart from '$lib/components/emotion/EmotionTrendChart.svelte';
 	import EmotionBars from '$lib/components/emotion/EmotionBars.svelte';
 	import IntimacyGauge from '$lib/components/emotion/IntimacyGauge.svelte';
-	import { emotions, emotionTrend } from '$lib/data/mock';
+	import { getEmotions, getIntimacy, getEmotionTrend } from '$lib/stores/emotion.svelte';
+	import { getEmotionEvents } from '$lib/stores/catalog.svelte';
+
+	const emotions = $derived(getEmotions());
+	const intimacy = $derived(getIntimacy());
+	const emotionTrend = $derived(getEmotionTrend());
+	const emotionEvents = $derived(getEmotionEvents());
 </script>
 
 <svelte:head>
@@ -17,12 +23,21 @@
 
 <div class="mb-6 grid gap-4 sm:grid-cols-3">
 	<div class="rounded-2xl border border-white/10 bg-bg-surface/50 p-6 sm:col-span-1">
-		<IntimacyGauge value={82} label="매우 가까운 관계" />
+		<IntimacyGauge value={intimacy} label="매우 가까운 관계" />
 	</div>
 	<div class="rounded-2xl border border-white/10 bg-bg-surface/50 p-6 sm:col-span-2">
 		<h2 class="mb-4 font-semibold">감정 상태</h2>
 		<EmotionBars {emotions} />
 	</div>
+</div>
+
+<div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+	{#each emotions as emo}
+		<div class="rounded-xl border border-white/10 bg-bg-surface/50 p-4 text-center">
+			<p class="text-2xl font-bold" style="color: {emo.color}">{Math.round(emo.value)}</p>
+			<p class="mt-1 text-xs text-text-muted">{emo.label}</p>
+		</div>
+	{/each}
 </div>
 
 <div class="grid gap-6 lg:grid-cols-2">
@@ -33,16 +48,32 @@
 
 	<section class="rounded-2xl border border-white/10 bg-bg-surface/50 p-6">
 		<div class="mb-4 flex items-center justify-between">
-			<h2 class="font-semibold">실시간 감정 변화</h2>
+			<h2 class="font-semibold">감정 추이</h2>
 			<select class="rounded-lg border border-white/10 bg-bg-primary/60 px-2 py-1 text-xs">
 				<option>최근 14일</option>
 				<option>최근 30일</option>
 			</select>
 		</div>
 		<EmotionTrendChart data={emotionTrend} height={160} />
-		<p class="mt-2 text-xs text-text-muted">※ 고급 히트맵·AI 인사이트는 Phase 3</p>
 	</section>
 </div>
+
+<section class="mt-6 rounded-2xl border border-white/10 bg-bg-surface/50 p-6">
+	<h2 class="mb-4 font-semibold">주요 감정 이벤트</h2>
+	<div class="space-y-3">
+		{#each emotionEvents as event}
+			<div class="flex items-center gap-4 rounded-xl border border-white/10 bg-bg-primary/40 px-4 py-3">
+				<span class="w-12 text-xs text-text-muted">{event.date}</span>
+				<p class="flex-1 text-sm">{event.title}</p>
+				<span
+					class="text-xs {event.type === 'positive' ? 'text-accent-green' : 'text-accent-red'}"
+				>
+					{event.delta}
+				</span>
+			</div>
+		{/each}
+	</div>
+</section>
 
 <section class="mt-6 rounded-2xl border border-white/10 bg-bg-surface/50 p-6">
 	<h2 class="mb-2 font-semibold">AI 인사이트</h2>

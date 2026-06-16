@@ -1,12 +1,45 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { getCharacter, worlds } from '$lib/data/mock';
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { getCatalogCharacter, getCatalogWorlds } from '$lib/stores/catalog.svelte';
+	import { initScenarios, getCharacterScenarios } from '$lib/stores/scenarios.svelte';
+	import { initRelationship } from '$lib/stores/relationship.svelte';
+	import { getEliaRelationships } from '$lib/stores/relationship.svelte';
+	import { isFavorite, toggleFavorite } from '$lib/stores/favorites.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { Heart, Share2, MessageCircle, Quote } from 'lucide-svelte';
+	import { Heart, Share2, MessageCircle, Quote, GitBranch } from 'lucide-svelte';
 
-	const character = $derived(getCharacter($page.params.id) ?? getCharacter('elia')!);
+	const character = $derived(
+		getCatalogCharacter($page.params.id ?? 'elia') ?? getCatalogCharacter('elia')!
+	);
+	const worlds = $derived(getCatalogWorlds());
 	const world = $derived(worlds.find((w) => w.id === character.worldId || w.name === character.world));
+	const scenarios = $derived(getCharacterScenarios(character.id));
+	const eliaRelationships = $derived(getEliaRelationships());
+	let selectedScenario = $state('default');
+	let favorited = $derived(isFavorite(character.id));
+	let shareToast = $state(false);
+
+	onMount(() => {
+		void initScenarios(character.id);
+		void initRelationship({ center: 'elia' });
+	});
+
+	function handleFavorite() {
+		toggleFavorite(character.id);
+	}
+
+	function handleShare() {
+		if (navigator.share) {
+			navigator.share({ title: character.name, url: window.location.href });
+		} else {
+			navigator.clipboard?.writeText(window.location.href);
+			shareToast = true;
+			setTimeout(() => (shareToast = false), 2000);
+		}
+	}
 </script>
 
 <svelte:head>
@@ -24,13 +57,52 @@
 					<MessageCircle class="h-4 w-4" />
 					대화 시작
 				</Button>
-				<button class="rounded-xl border border-white/10 p-3 hover:bg-white/5" aria-label="즐겨찾기">
-					<Heart class="h-5 w-5" />
+				<button
+					type="button"
+					class="rounded-xl border border-white/10 p-3 hover:bg-white/5 {favorited
+						? 'text-accent-pink'
+						: ''}"
+					aria-label="즐겨찾기"
+					onclick={handleFavorite}
+				>
+					<Heart class="h-5 w-5" fill={favorited ? 'currentColor' : 'none'} />
 				</button>
-				<button class="rounded-xl border border-white/10 p-3 hover:bg-white/5" aria-label="공유">
+				<button
+					type="button"
+					class="rounded-xl border border-white/10 p-3 hover:bg-white/5"
+					aria-label="공유"
+					onclick={handleShare}
+				>
 					<Share2 class="h-5 w-5" />
 				</button>
 			</div>
+			{#if shareToast}
+				<p class="text-center text-xs text-accent-green">링크가 복사되었습니다</p>
+			{/if}
+
+			{#if scenarios.length}
+				<div class="rounded-2xl border border-white/10 bg-bg-surface/50 p-4">
+					<p class="mb-2 text-xs font-medium text-text-muted">시나리오 선택</p>
+					<div class="space-y-2">
+						{#each scenarios as scenario}
+							<button
+								type="button"
+								onclick={() => {
+									selectedScenario = scenario.id;
+									goto(`/chat/${character.id}?scenario=${scenario.id}`);
+								}}
+								class="w-full rounded-xl border px-3 py-2 text-left text-sm transition {selectedScenario ===
+								scenario.id
+									? 'border-primary-500 bg-primary-600/20'
+									: 'border-white/10 hover:bg-white/5'}"
+							>
+								<p class="font-medium">{scenario.title}</p>
+								<p class="text-xs text-text-muted">{scenario.description}</p>
+							</button>
+						{/each}
+					</div>
+				</div>
+			{/if}
 
 			{#if world}
 				<div class="rounded-2xl border border-white/10 bg-bg-surface/50 p-4">
@@ -102,6 +174,26 @@
 						'아직 저장된 기억이 없습니다. 대화를 시작하면 에피소드가 자동으로 기록됩니다.'}
 				</div>
 			</section>
+
+			{#if character.id === 'elia'}
+				<section>
+					<h2 class="mb-3 flex items-center gap-2 font-semibold">
+						<GitBranch class="h-4 w-4 text-primary-400" />
+						관계 요약
+					</h2>
+					<div class="grid gap-2 sm:grid-cols-2">
+						{#each eliaRelationships.slice(0, 4) as rel}
+							<div class="rounded-xl border border-white/10 bg-bg-surface/40 px-4 py-3 text-sm">
+								<span class="text-text-muted">{rel.name}</span>
+								<span class="ml-2 text-primary-300">{rel.score}</span>
+							</div>
+						{/each}
+					</div>
+					<a href="/relationship" class="mt-2 inline-block text-sm text-primary-400 hover:underline">
+						전체 관계도 보기 →
+					</a>
+				</section>
+			{/if}
 		</div>
 	</div>
 </div>

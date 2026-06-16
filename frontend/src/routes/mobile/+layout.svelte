@@ -1,9 +1,15 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import MobileShell from '$lib/components/layout/MobileShell.svelte';
+	import { initCatalog } from '$lib/stores/catalog.svelte';
 
 	let { children }: { children: import('svelte').Snippet } = $props();
 	const isShowcase = $derived($page.url.pathname === '/mobile');
+
+	onMount(() => {
+		void initCatalog();
+	});
 </script>
 
 {#if isShowcase}

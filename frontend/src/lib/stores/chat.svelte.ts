@@ -1,6 +1,10 @@
 import type { ChatMessage } from '$lib/data/mock';
-import { chatMessages as seedMessages } from '$lib/data/mock';
+import { fetchChatMessages, streamChatMessageApi } from '$lib/api/chat';
+import { createMemory } from '$lib/api/resources';
+import { apiHealth } from '$lib/api/client';
+import { refreshChatSessions, refreshMemories } from '$lib/stores/catalog.svelte';
 import { applyEmotionDelta } from '$lib/stores/emotion.svelte';
+import { uuid } from '$lib/utils/uuid';
 
 export type InteractionType = 'action' | 'expression' | 'gift' | 'record';
 
@@ -27,13 +31,31 @@ export const giftPresets = [
 	{ id: 'book', name: '고서', delta: { label: '존경', value: 3 } }
 ];
 
-let sessions = $state<Record<string, ChatMessage[]>>({
-	elia: [...seedMessages]
-});
+let sessions = $state<Record<string, ChatMessage[]>>({});
 
 const streamingTimers = new Map<string, ReturnType<typeof setInterval>>();
 
 let isReplying = $state<Record<string, boolean>>({});
+let apiEnabled = $state(false);
+let apiReady = false;
+
+export async function initChatApi(): Promise<boolean> {
+	if (apiReady) return apiEnabled;
+	apiReady = true;
+	apiEnabled = await apiHealth();
+	return apiEnabled;
+}
+
+export async function loadChatHistory(characterId: string): Promise<void> {
+	await initChatApi();
+	if (!apiEnabled) return;
+	try {
+		const msgs = await fetchChatMessages(characterId);
+		if (msgs.length) patchSession(characterId, msgs);
+	} catch {
+		/* mock fallback */
+	}
+}
 
 function setReplying(characterId: string, value: boolean) {
 	isReplying = { ...isReplying, [characterId]: value };
@@ -49,7 +71,7 @@ function nowTime() {
 
 function ensureSession(characterId: string) {
 	if (!sessions[characterId]) {
-		patchSession(characterId, characterId === 'elia' ? [...seedMessages] : []);
+		patchSession(characterId, []);
 	}
 }
 
@@ -73,7 +95,7 @@ function parseUserInput(text: string): ChatMessage[] {
 	if (/^\*.+\*$/.test(trimmed)) {
 		return [
 			{
-				id: crypto.randomUUID(),
+				id: uuid(),
 				role: 'narration',
 				content: trimmed.slice(1, -1)
 			}
@@ -82,7 +104,7 @@ function parseUserInput(text: string): ChatMessage[] {
 
 	return [
 		{
-			id: crypto.randomUUID(),
+			id: uuid(),
 			role: 'user',
 			content: trimmed,
 			timestamp: nowTime()
@@ -118,7 +140,7 @@ function streamCharacterReply(
 	emotionDelta?: string
 ) {
 	const fullText = pickReply(characterName, interaction);
-	const messageId = crypto.randomUUID();
+	const messageId = uuid();
 
 	appendMessages(characterId, [
 		{
@@ -170,10 +192,18 @@ function triggerReply(
 }
 
 export function getChatMessages(characterId: string): ChatMessage[] {
-	return sessions[characterId] ?? (characterId === 'elia' ? seedMessages : []);
+	return sessions[characterId] ?? [];
 }
 
 export function sendChatMessage(characterId: string, characterName: string, text: string) {
+	const trimmed = text.trim();
+	if (!trimmed) return;
+
+	if (apiEnabled) {
+		void sendChatMessageViaApi(characterId, trimmed);
+		return;
+	}
+
 	const parsed = parseUserInput(text);
 	if (!parsed.length) return;
 
@@ -182,6 +212,48 @@ export function sendChatMessage(characterId: string, characterName: string, text
 	const last = parsed[parsed.length - 1];
 	if (last.role === 'user' || last.role === 'narration') {
 		triggerReply(characterId, characterName);
+	}
+}
+
+async function sendChatMessageViaApi(characterId: string, text: string) {
+	const parsed = parseUserInput(text);
+	appendMessages(characterId, parsed);
+
+	const streamId = uuid();
+	appendMessages(characterId, [
+		{
+			id: streamId,
+			role: 'character',
+			content: '',
+			isStreaming: true,
+			timestamp: nowTime()
+		}
+	]);
+
+	setReplying(characterId, true);
+	try {
+		const finalMsg = await streamChatMessageApi(characterId, text, (partial) => {
+			updateMessage(characterId, streamId, { content: partial, isStreaming: true });
+		});
+		updateMessage(characterId, streamId, {
+			...finalMsg,
+			id: streamId,
+			isStreaming: false
+		});
+		if (finalMsg.emotionDelta) {
+			const match = finalMsg.emotionDelta.match(/^(애정|신뢰|존경|분노|공포|질투)\s*([+-]?\d+)/);
+			if (match) applyEmotionDelta(match[1], Number(match[2]));
+		}
+	} catch {
+		updateMessage(characterId, streamId, {
+			role: 'character',
+			content: '…잠시 연결에 문제가 있었어요.',
+			isStreaming: false,
+			timestamp: nowTime()
+		});
+	} finally {
+		setReplying(characterId, false);
+		void refreshChatSessions();
 	}
 }
 
@@ -198,7 +270,7 @@ export function sendInteraction(
 		case 'action':
 			messages = [
 				{
-					id: crypto.randomUUID(),
+					id: uuid(),
 					role: 'narration',
 					content: `*당신이 ${payload}*`,
 					interactionType: 'action'
@@ -209,7 +281,7 @@ export function sendInteraction(
 		case 'expression':
 			messages = [
 				{
-					id: crypto.randomUUID(),
+					id: uuid(),
 					role: 'user',
 					content: payload,
 					timestamp: nowTime(),
@@ -223,7 +295,7 @@ export function sendInteraction(
 			if (!gift) return;
 			messages = [
 				{
-					id: crypto.randomUUID(),
+					id: uuid(),
 					role: 'user',
 					content: `🎁 ${gift.name}을(를) 선물했다`,
 					timestamp: nowTime(),
@@ -236,7 +308,7 @@ export function sendInteraction(
 		case 'record':
 			messages = [
 				{
-					id: crypto.randomUUID(),
+					id: uuid(),
 					role: 'system',
 					content: `✦ 기억이 저장되었습니다 — [${payload}]`,
 					interactionType: 'record'
@@ -244,6 +316,17 @@ export function sendInteraction(
 			];
 			applyEmotionDelta('신뢰', 3);
 			appendMessages(characterId, messages);
+			if (apiEnabled) {
+				void createMemory({
+					characterId,
+					title: payload,
+					summary: payload,
+					importance: 'high',
+					tags: ['기록']
+				})
+					.then(() => refreshMemories(characterId))
+					.catch(() => undefined);
+			}
 			return;
 	}
 

@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import * as d3 from 'd3';
-	import { graphNodes, graphEdges, edgeStyles } from '$lib/data/relationship';
+	import { edgeStyles } from '$lib/data/relationship';
+	import { getRelationshipGraph } from '$lib/stores/catalog.svelte';
 
 	interface Props {
 		centerId?: string;
@@ -18,7 +19,9 @@
 	onMount(() => {
 		if (!browser || !container) return;
 
+		const { nodes: graphNodes, edges: graphEdges } = getRelationshipGraph();
 		const center = graphNodes.find((n) => n.id === centerId) ?? graphNodes[0];
+		if (!center) return;
 		const connectedIds = new Set<string>([center.id]);
 		const localEdges = graphEdges.filter((e) => {
 			if (e.source === center.id || e.target === center.id) {

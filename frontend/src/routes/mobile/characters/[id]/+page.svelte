@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { getCharacter } from '$lib/data/mock';
+	import { getCatalogCharacter } from '$lib/stores/catalog.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { Heart, MessageCircle } from 'lucide-svelte';
 
-	const character = $derived(getCharacter($page.params.id) ?? getCharacter('elia')!);
+	const character = $derived(
+		getCatalogCharacter($page.params.id ?? 'elia') ?? getCatalogCharacter('elia')!
+	);
 </script>
 
 <svelte:head>

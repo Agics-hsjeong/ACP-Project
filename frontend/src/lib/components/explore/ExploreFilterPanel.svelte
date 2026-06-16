@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
-	import { exploreTags } from '$lib/data/mock';
+	import { getExploreTags } from '$lib/stores/meta.svelte';
 
 	interface Props {
 		sort?: string;
@@ -15,6 +15,8 @@
 		selectedTags = $bindable([] as string[]),
 		onSearch
 	}: Props = $props();
+
+	const exploreTags = $derived(getExploreTags());
 
 	function toggleTag(tag: string) {
 		selectedTags = selectedTags.includes(tag)

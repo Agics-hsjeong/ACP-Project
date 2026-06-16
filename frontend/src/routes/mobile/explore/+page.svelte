@@ -1,11 +1,15 @@
 <script lang="ts">
-	import { characters, exploreGenres } from '$lib/data/mock';
+	import { getCatalogCharacters } from '$lib/stores/catalog.svelte';
+	import { getExploreGenres } from '$lib/stores/meta.svelte';
 	import SearchBar from '$lib/components/ui/SearchBar.svelte';
 	let genre = $state('전체');
 	let query = $state('');
 
+	const catalogCharacters = $derived(getCatalogCharacters());
+	const exploreGenres = $derived(getExploreGenres());
+
 	const filtered = $derived(
-		characters.filter(
+		catalogCharacters.filter(
 			(c) =>
 				(genre === '전체' || c.genre?.includes(genre) || c.tags.some((t) => t.includes(genre))) &&
 				(!query || c.name.includes(query) || c.world.includes(query))

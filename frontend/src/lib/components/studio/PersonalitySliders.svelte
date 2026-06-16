@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PersonalityTrait } from '$lib/data/studio';
+	type PersonalityTrait = { key: string; label: string; value: number };
 
 	interface Props {
 		traits: PersonalityTrait[];

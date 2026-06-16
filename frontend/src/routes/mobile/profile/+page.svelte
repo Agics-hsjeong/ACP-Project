@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { userProfile } from '$lib/data/mock';
+	import { getUser, logout } from '$lib/stores/auth.svelte';
+	import { getDailyQuests, getUserProfileStats } from '$lib/stores/catalog.svelte';
+	import { goto } from '$app/navigation';
 	import Button from '$lib/components/ui/Button.svelte';
 	import {
 		Brain,
@@ -9,6 +11,10 @@
 		Settings,
 		ChevronRight
 	} from 'lucide-svelte';
+
+	const user = $derived(getUser());
+	const dailyQuests = $derived(getDailyQuests());
+	const stats = $derived(getUserProfileStats());
 
 	const menu = [
 		{ href: '/mobile/memory', label: '기억 보관소', icon: Brain },
@@ -25,26 +31,24 @@
 
 <div class="border-b border-white/10 p-4">
 	<div class="flex items-center gap-4">
-		<img src={userProfile.avatar} alt="" class="h-14 w-14 rounded-full bg-bg-card" />
+		<img
+			src={user?.picture || `https://api.dicebear.com/9.x/notionists/svg?seed=${user?.email || 'user'}`}
+			alt=""
+			class="h-14 w-14 rounded-full bg-bg-card"
+		/>
 		<div class="flex-1">
-			<p class="font-bold">{userProfile.name}</p>
-			<p class="text-xs text-text-muted">Lv. {userProfile.level}</p>
-			<div class="mt-2 h-1.5 rounded-full bg-bg-card">
-				<div
-					class="h-full rounded-full bg-primary-500"
-					style="width: {userProfile.xp}%"
-				></div>
-			</div>
+			<p class="font-bold">{user?.name || 'Creator'}</p>
+			<p class="text-xs text-text-muted">{user?.email || ''}</p>
 		</div>
 	</div>
 </div>
 
 <div class="grid grid-cols-2 gap-2 p-4">
 	{#each [
-		{ label: '제작 캐릭터', value: userProfile.stats.charactersCreated },
-		{ label: '제작 세계관', value: userProfile.stats.worldsCreated },
-		{ label: '총 대화', value: userProfile.stats.totalChats },
-		{ label: '저장 기억', value: userProfile.stats.savedMemories }
+		{ label: '캐릭터', value: stats.charactersCreated },
+		{ label: '세계관', value: stats.worldsCreated },
+		{ label: '총 대화', value: stats.totalChats },
+		{ label: '저장 기억', value: stats.savedMemories }
 	] as stat}
 		<div class="rounded-xl border border-white/10 bg-bg-surface/50 p-3 text-center">
 			<p class="text-lg font-bold">{stat.value}</p>
@@ -52,6 +56,15 @@
 		</div>
 	{/each}
 </div>
+
+<section class="px-4 pb-4">
+	<h2 class="mb-2 text-sm font-semibold">데일리 퀘스트</h2>
+	{#each dailyQuests as quest}
+		<div class="mb-2 rounded-xl border border-white/10 bg-bg-surface/50 p-3 text-xs">
+			{quest.title} · {quest.progress}/{quest.total}
+		</div>
+	{/each}
+</section>
 
 <nav class="space-y-1 px-4">
 	{#each menu as item}
@@ -67,5 +80,5 @@
 </nav>
 
 <div class="p-4">
-	<Button href="/login" variant="ghost" fullWidth>로그아웃</Button>
+	<Button variant="ghost" fullWidth onclick={() => { logout(); goto('/login'); }}>로그아웃</Button>
 </div>
