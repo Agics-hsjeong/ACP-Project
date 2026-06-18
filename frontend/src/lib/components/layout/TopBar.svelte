@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { getSearchQuery, setSearchQuery } from '$lib/stores/search.svelte';
+	import { isLoggedIn } from '$lib/stores/auth.svelte';
+	import { getLoginUrl } from '$lib/auth/access';
 	import { Bell, Mail } from 'lucide-svelte';
 	import SearchBar from '$lib/components/ui/SearchBar.svelte';
 
@@ -10,6 +12,8 @@
 
 	let { title }: Props = $props();
 	let query = $state(getSearchQuery());
+
+	const loggedIn = $derived(isLoggedIn());
 
 	function submitSearch() {
 		const value = query.trim();
@@ -26,15 +30,35 @@
 		<SearchBar bind:value={query} placeholder="캐릭터·세계관 검색..." />
 	</form>
 	<div class="ml-auto flex items-center gap-2">
-		<button type="button" class="relative rounded-lg p-2 text-text-secondary hover:bg-white/5 hover:text-text-primary" aria-label="알림">
-			<Bell class="h-5 w-5" />
-			<span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent-red"></span>
-		</button>
-		<button type="button" class="rounded-lg p-2 text-text-secondary hover:bg-white/5 hover:text-text-primary" aria-label="메시지">
-			<Mail class="h-5 w-5" />
-		</button>
-		<a href="/mypage" class="ml-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-medium">
-			C
-		</a>
+		{#if loggedIn}
+			<button
+				type="button"
+				class="relative rounded-lg p-2 text-text-secondary hover:bg-white/5 hover:text-text-primary"
+				aria-label="알림"
+			>
+				<Bell class="h-5 w-5" />
+				<span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent-red"></span>
+			</button>
+			<button
+				type="button"
+				class="rounded-lg p-2 text-text-secondary hover:bg-white/5 hover:text-text-primary"
+				aria-label="메시지"
+			>
+				<Mail class="h-5 w-5" />
+			</button>
+			<a
+				href="/mypage"
+				class="ml-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-medium"
+			>
+				C
+			</a>
+		{:else}
+			<a
+				href={getLoginUrl('/home')}
+				class="rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-500"
+			>
+				로그인
+			</a>
+		{/if}
 	</div>
 </header>

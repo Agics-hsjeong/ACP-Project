@@ -3,6 +3,7 @@
 	import CharacterCard from '$lib/components/cards/CharacterCard.svelte';
 	import { getCatalogCharacters } from '$lib/stores/catalog.svelte';
 	import { getLandingFeatures } from '$lib/stores/content.svelte';
+	import { getLoginUrl } from '$lib/auth/access';
 	import { Compass, Pencil, Sparkles, Globe, Brain, Heart, Users } from 'lucide-svelte';
 
 	const characters = $derived(getCatalogCharacters());
@@ -55,7 +56,7 @@
 						<Compass class="h-4 w-4" />
 						캐릭터 탐험하기
 					</Button>
-					<Button variant="secondary" href="/studio/world" size="lg" fullWidth>
+					<Button variant="secondary" href={getLoginUrl('/studio/world')} size="lg" fullWidth>
 						<Pencil class="h-4 w-4" />
 						나만의 세계관 만들기
 					</Button>

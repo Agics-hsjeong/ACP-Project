@@ -16,7 +16,7 @@
 	let { tags, memories, activeTag = '', onselect }: Props = $props();
 </script>
 
-<div class="rounded-2xl border border-white/10 bg-bg-surface/50 p-5">
+<div>
 	<h3 class="mb-4 text-sm font-semibold">Top 5 태그</h3>
 	<div class="space-y-2">
 		{#each tags as item}

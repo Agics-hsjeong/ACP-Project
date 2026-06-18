@@ -33,9 +33,22 @@
 	--color-bg-elevated: #475569;
 	--color-border-default: #475569;
 
-	--color-text-primary: #f8fafc;
+	--color-text-primary: #f2f5ff;
 	--color-text-secondary: #cbd5e1;
-	--color-text-muted: #94a3b8;
+	--color-text-muted: #8c91a6;
+
+	/* Figma mockup tokens (Screen 03–12) */
+	--color-mock-bg: #0a0a14;
+	--color-mock-panel: #1a1c26;
+	--color-mock-border: #333847;
+	--color-mock-accent: #8c5cfa;
+	--color-mock-track: #262933;
+	--color-emo-affection: #f26699;
+	--color-emo-trust: #4d80f2;
+	--color-emo-respect: #33b266;
+	--color-emo-anger: #f28033;
+	--color-emo-jealousy: #994de5;
+	--color-emo-fear: #808080;
 
 	--radius-xs: 4px;
 	--radius-sm: 8px;
@@ -64,7 +77,13 @@
 }
 
 @layer utilities {
-	.glass {
+	.mock-panel {
+		@apply rounded-xl border border-[#333847] bg-[#1a1c26];
+	}
+
+	.mock-bg {
+		@apply bg-[#0a0a14];
+	}
 		@apply bg-bg-surface/80 backdrop-blur-md border border-white/10;
 	}
 

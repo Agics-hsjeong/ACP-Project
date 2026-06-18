@@ -3,6 +3,7 @@ import { apiHealth } from '$lib/api/client';
 import {
 	listStudioCharacters,
 	listStudioWorlds,
+	createStudioCharacter,
 	patchStudioCharacter,
 	patchStudioWorld
 } from '$lib/api/studio';
@@ -48,5 +49,11 @@ export async function saveStudioWorld(id: string, patch: Parameters<typeof patch
 	const updated = await patchStudioWorld(id, patch);
 	studioWorlds = studioWorlds.map((w) => (w.id === id ? updated : w));
 	return updated;
+}
+
+export async function addStudioCharacter(payload: Parameters<typeof createStudioCharacter>[0]) {
+	const created = await createStudioCharacter(payload);
+	studioCharacters = [...studioCharacters, created];
+	return created;
 }
 

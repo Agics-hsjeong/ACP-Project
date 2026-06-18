@@ -2,7 +2,9 @@
 	import {
 		getCatalogMemories,
 		getCatalogMemoryStats,
-		getMemoryTopTags
+		getMemoryTopTags,
+		getCatalogCharacters,
+		refreshMemories
 	} from '$lib/stores/catalog.svelte';
 	import MemoryCard from '$lib/components/memory/MemoryCard.svelte';
 	import MemoryDetailPanel from '$lib/components/memory/MemoryDetailPanel.svelte';
@@ -12,8 +14,16 @@
 	const memoryStats = $derived(getCatalogMemoryStats());
 	const memoryTopTags = $derived(getMemoryTopTags());
 	const memoryFidelity = $derived(memoryStats.fidelity);
+	const characters = $derived(getCatalogCharacters());
 
+	let characterId = $state('elia');
 	let selectedId = $state('');
+
+	const activeCharacter = $derived(characters.find((c) => c.id === characterId));
+
+	$effect(() => {
+		void refreshMemories(characterId);
+	});
 
 	$effect(() => {
 		if (!selectedId && memories.length) selectedId = memories[0].id;
@@ -28,7 +38,15 @@
 
 <div class="border-b border-white/10 p-4">
 	<h1 class="text-lg font-bold">기억 보관소</h1>
-	<p class="text-xs text-text-muted">Episodic Memory</p>
+	<p class="text-xs text-text-muted">{activeCharacter?.name ?? '캐릭터'} · Episodic Memory</p>
+	<select
+		bind:value={characterId}
+		class="mt-2 h-9 w-full rounded-lg border border-white/10 bg-bg-primary/60 px-3 text-xs outline-none focus:border-primary-500"
+	>
+		{#each characters as c}
+			<option value={c.id}>{c.name}</option>
+		{/each}
+	</select>
 </div>
 
 <div class="p-4">

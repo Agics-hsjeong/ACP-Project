@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
-	import { loginWithApi, loginWithGoogle } from '$lib/stores/auth.svelte';
+	import { loginWithApi, loginWithGoogle, isLoggedIn } from '$lib/stores/auth.svelte';
+	import { safeRedirectPath } from '$lib/auth/access';
+	import { refreshPrivateCatalogData } from '$lib/stores/catalog.svelte';
 	import { isFirebaseConfigured } from '$lib/firebase/client';
 	import { Shield, Brain, Globe } from 'lucide-svelte';
 
@@ -16,17 +19,38 @@
 	let authError = $state('');
 
 	const firebaseReady = isFirebaseConfigured();
+	const redirectTo = $derived(safeRedirectPath($page.url.searchParams.get('redirect')));
+
+	$effect(() => {
+		if (isLoggedIn()) goto(redirectTo);
+	});
 
 	const bgImage =
 		'https://api.dicebear.com/9.x/shapes/svg?seed=login-bg&backgroundColor=0f172a&scale=120';
+
+	async function afterLogin() {
+		await refreshPrivateCatalogData();
+		goto(redirectTo);
+	}
 
 	async function handleLogin(e: Event) {
 		e.preventDefault();
 		authError = '';
 		try {
-			if (tab === 'email') await loginWithApi(email || 'user@acp.local', password);
-			else await loginWithApi(phone || '010-user@acp.local');
-			goto('/home');
+			if (tab === 'email') {
+				if (!email.trim()) {
+					authError = '이메일을 입력해 주세요.';
+					return;
+				}
+				await loginWithApi(email.trim(), password);
+			} else {
+				if (!phone.trim()) {
+					authError = '휴대폰 번호를 입력해 주세요.';
+					return;
+				}
+				await loginWithApi(phone.trim());
+			}
+			await afterLogin();
 		} catch (err) {
 			authError = err instanceof Error ? err.message : '로그인에 실패했습니다.';
 		}
@@ -37,7 +61,7 @@
 		googleLoading = true;
 		try {
 			await loginWithGoogle();
-			goto('/home');
+			await afterLogin();
 		} catch (err) {
 			authError = err instanceof Error ? err.message : 'Google 로그인에 실패했습니다.';
 		} finally {
@@ -49,7 +73,7 @@
 		authError = '';
 		try {
 			await loginWithApi('', undefined, provider);
-			goto('/home');
+			await afterLogin();
 		} catch (err) {
 			authError = err instanceof Error ? err.message : '소셜 로그인에 실패했습니다.';
 		}

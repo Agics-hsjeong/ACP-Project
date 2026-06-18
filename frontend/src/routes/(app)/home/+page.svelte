@@ -1,146 +1,154 @@
 <script lang="ts">
-	import CharacterCard from '$lib/components/cards/CharacterCard.svelte';
-	import WorldCard from '$lib/components/cards/WorldCard.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
+	import { onMount } from 'svelte';
+	import ScreenSearchBar from '$lib/components/mockup/ScreenSearchBar.svelte';
+	import MockSectionHeader from '$lib/components/mockup/MockSectionHeader.svelte';
+	import CharacterPortraitCard from '$lib/components/mockup/CharacterPortraitCard.svelte';
+	import WorldStripCard from '$lib/components/mockup/WorldStripCard.svelte';
+	import HomeDashboardPanel from '$lib/components/home/HomeDashboardPanel.svelte';
+	import GuestHomePanel from '$lib/components/home/GuestHomePanel.svelte';
 	import {
 		getCatalogCharacters,
 		getCatalogWorlds,
-		getCatalogRecentChats,
+		getCatalogLoadError,
 		getDailyQuests,
-		getRecommendedStories,
 		isCatalogLoading
 	} from '$lib/stores/catalog.svelte';
-	import { Compass, BookOpen, Target } from 'lucide-svelte';
+	import { initEmotionApi } from '$lib/stores/emotion.svelte';
+	import { initRelationship } from '$lib/stores/relationship.svelte';
+	import { isLoggedIn } from '$lib/stores/auth.svelte';
+	import { Target } from 'lucide-svelte';
 
 	const characters = $derived(getCatalogCharacters());
 	const worlds = $derived(getCatalogWorlds());
-	const recentChats = $derived(getCatalogRecentChats());
-	const recommendedStories = $derived(getRecommendedStories());
 	const dailyQuests = $derived(getDailyQuests());
 	const loading = $derived(isCatalogLoading());
+	const loadError = $derived(getCatalogLoadError());
+	const loggedIn = $derived(isLoggedIn());
+
+	const heroCharacter = $derived(characters[0]);
+	const recommendedCharacters = $derived(characters.slice(0, 6));
+	const popularWorlds = $derived(worlds.slice(0, 5));
+
+	const questCards = $derived([
+		...dailyQuests,
+		{
+			id: 'q4',
+			title: '관계도 1회 탐색',
+			progress: 0,
+			total: 1,
+			reward: 'XP +15'
+		}
+	].slice(0, 4));
+
+	onMount(() => {
+		if (!isLoggedIn()) return;
+		void initRelationship({ world: 'arcadia', center: 'elia' });
+		void initEmotionApi('elia');
+	});
 </script>
 
-<section class="relative mb-8 overflow-hidden rounded-2xl border border-white/10">
-	<div class="absolute inset-0 bg-gradient-to-r from-primary-900/80 via-bg-surface/60 to-transparent"></div>
-	<img
-		src="https://api.dicebear.com/9.x/shapes/svg?seed=hero&backgroundColor=312e81"
-		alt=""
-		class="absolute inset-0 h-full w-full object-cover opacity-40"
-	/>
-	<div class="relative flex flex-col justify-center gap-4 p-8 md:max-w-lg md:p-12">
-		<h2 class="text-2xl font-bold md:text-3xl">당신만의 캐릭터와 특별한 이야기를 만들어보세요</h2>
-		<p class="text-sm text-text-secondary">Living World Engine이 기억하고, 감정하고, 함께 성장합니다.</p>
-		<Button href="/explore" class="w-fit">
-			<Compass class="h-4 w-4" />
-			캐릭터 탐색하기
-		</Button>
-	</div>
-</section>
+<svelte:head>
+	<title>홈 — ACP</title>
+</svelte:head>
 
-{#if loading}
-	<p class="mb-6 text-center text-sm text-text-muted">데이터를 불러오는 중…</p>
-{/if}
+<div class="-m-2 min-h-full bg-mock-bg p-2 lg:-m-4 lg:p-4">
+	<ScreenSearchBar placeholder="캐릭터, 세계관, 스토리 검색…" />
 
-<section class="mb-8">
-	<div class="mb-4 flex items-center justify-between">
-		<h2 class="text-lg font-semibold">추천 캐릭터</h2>
-		<a href="/explore" class="text-sm text-primary-400 hover:underline">전체 보기</a>
-	</div>
-	<div class="flex gap-4 overflow-x-auto pb-2">
-		{#each characters as character}
-			<CharacterCard {character} />
-		{:else}
-			<p class="text-sm text-text-muted">등록된 캐릭터가 없습니다.</p>
-		{/each}
-	</div>
-</section>
-
-<section class="mb-8">
-	<div class="mb-4 flex items-center justify-between">
-		<h2 class="flex items-center gap-2 text-lg font-semibold">
-			<BookOpen class="h-4 w-4 text-primary-400" />
-			추천 스토리
-		</h2>
-	</div>
-	<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-		{#each recommendedStories as story}
-			<a
-				href="/chat/{story.characterId}"
-				class="group overflow-hidden rounded-2xl border border-white/10 bg-bg-surface/50 transition hover:border-primary-500/40"
-			>
-				<img src={story.cover} alt="" class="h-32 w-full object-cover opacity-80 group-hover:opacity-100" />
-				<div class="p-4">
-					<p class="text-xs text-primary-300">{story.world}</p>
-					<p class="font-semibold">{story.title}</p>
-					<p class="mt-1 line-clamp-2 text-xs text-text-muted">{story.summary}</p>
-					<p class="mt-2 text-[10px] text-text-muted">{story.characterName} · {story.reads.toLocaleString()} 읽음</p>
-				</div>
-			</a>
-		{/each}
-	</div>
-</section>
-
-<section class="mb-8">
-	<div class="mb-4 flex items-center justify-between">
-		<h2 class="text-lg font-semibold">인기 세계관</h2>
-		<a href="/explore" class="text-sm text-primary-400 hover:underline">전체 보기</a>
-	</div>
-	<div class="flex gap-4 overflow-x-auto pb-2">
-		{#each worlds as world}
-			<WorldCard {world} />
-		{/each}
-	</div>
-</section>
-
-<section class="mb-8 grid gap-6 lg:grid-cols-3">
-	<div class="lg:col-span-2">
-		<div class="mb-4 flex items-center justify-between">
-			<h2 class="text-lg font-semibold">최근 대화</h2>
+	{#if loadError}
+		<div class="mb-4 rounded-xl border border-accent-red/30 bg-accent-red/10 px-4 py-3 text-sm text-accent-red">
+			{loadError}
 		</div>
-		<div class="grid gap-3 sm:grid-cols-2">
-			{#each recentChats as chat}
-				<a
-					href="/chat/{chat.id}"
-					class="flex items-center gap-4 rounded-xl border border-white/10 bg-bg-surface/50 p-4 transition hover:border-primary-500/30"
-				>
+	{/if}
+
+	<div class="flex gap-5">
+		<div class="min-w-0 flex-1 space-y-6">
+			<!-- 히어로 배너 -->
+			<section class="relative overflow-hidden rounded-xl border border-mock-border">
+				<div class="absolute inset-0 bg-gradient-to-r from-mock-bg via-mock-bg/70 to-transparent"></div>
+				{#if heroCharacter}
 					<img
-						src={chat.avatar || `https://api.dicebear.com/9.x/notionists/svg?seed=${chat.id}`}
+						src={heroCharacter.cover}
 						alt=""
-						class="h-12 w-12 rounded-full bg-bg-card"
+						class="absolute inset-0 h-full w-full object-cover opacity-40"
 					/>
-					<div class="min-w-0 flex-1">
-						<p class="font-medium">{chat.name}</p>
-						<p class="truncate text-sm text-text-muted">{chat.preview}</p>
-					</div>
-					{#if chat.time}
-						<span class="text-xs text-text-muted">{chat.time}</span>
-					{/if}
-				</a>
-			{/each}
-		</div>
-	</div>
-
-	<div class="rounded-2xl border border-white/10 bg-bg-surface/50 p-5">
-		<h2 class="mb-4 flex items-center gap-2 text-lg font-semibold">
-			<Target class="h-4 w-4 text-accent-gold" />
-			데일리 퀘스트
-		</h2>
-		<div class="space-y-3">
-			{#each dailyQuests as quest}
-				<div class="rounded-xl border border-white/10 bg-bg-primary/40 p-3">
-					<div class="mb-2 flex justify-between text-sm">
-						<span>{quest.title}</span>
-						<span class="text-xs text-primary-300">{quest.reward}</span>
-					</div>
-					<div class="h-1.5 overflow-hidden rounded-full bg-bg-card">
-						<div
-							class="h-full rounded-full bg-primary-500"
-							style="width: {(quest.progress / quest.total) * 100}%"
-						></div>
-					</div>
-					<p class="mt-1 text-[10px] text-text-muted">{quest.progress}/{quest.total}</p>
+				{/if}
+				<div class="relative flex min-h-[200px] flex-col justify-center gap-3 p-8 md:max-w-lg">
+					<p class="text-[10px] font-medium tracking-[0.2em] text-mock-accent">LIVING WORLD ENGINE</p>
+					<h2 class="text-2xl leading-snug font-bold md:text-3xl">
+						당신만의 캐릭터와<br />특별한 이야기를 만들어가세요
+					</h2>
+					<p class="text-sm text-text-secondary">오늘도 새로운 이야기가 시작됩니다</p>
+					<a
+						href="/explore"
+						class="mt-1 inline-flex w-fit items-center gap-2 rounded-lg bg-mock-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-mock-accent/90"
+					>
+						캐릭터 탐험하기 →
+					</a>
 				</div>
-			{/each}
+			</section>
+
+			{#if loading}
+				<p class="text-center text-sm text-text-muted">데이터를 불러오는 중…</p>
+			{/if}
+
+			<!-- 추천 캐릭터 -->
+			<section>
+				<MockSectionHeader title="추천 캐릭터" href="/explore" />
+				<div class="flex gap-3 overflow-x-auto pb-1">
+					{#each recommendedCharacters as character}
+						<CharacterPortraitCard {character} />
+					{:else}
+						<p class="text-sm text-text-muted">등록된 캐릭터가 없습니다.</p>
+					{/each}
+				</div>
+			</section>
+
+			<!-- 인기 세계관 -->
+			<section>
+				<MockSectionHeader title="인기 세계관" href="/explore" />
+				<div class="flex gap-3 overflow-x-auto pb-1">
+					{#each popularWorlds as world}
+						<WorldStripCard {world} />
+					{/each}
+				</div>
+			</section>
+
+			<!-- 오늘의 추천 콘텐츠 -->
+			{#if loggedIn}
+				<section>
+					<MockSectionHeader title="오늘의 추천 콘텐츠" />
+					<div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+						{#each questCards as quest}
+							<div class="rounded-xl border border-mock-border bg-mock-panel p-4 transition hover:border-mock-accent/30">
+								<div class="mb-2 flex items-start justify-between gap-2">
+									<p class="text-sm font-medium leading-snug">{quest.title}</p>
+									<span class="shrink-0 rounded-md bg-mock-accent/15 px-2 py-0.5 text-[10px] text-mock-accent">
+										{quest.reward}
+									</span>
+								</div>
+								<div class="h-1.5 overflow-hidden rounded-full bg-mock-track">
+									<div
+										class="h-full rounded-full bg-mock-accent transition-all"
+										style="width: {(quest.progress / quest.total) * 100}%"
+									></div>
+								</div>
+								<p class="mt-1.5 flex items-center gap-1 text-[10px] text-text-muted">
+									<Target class="h-3 w-3" />
+									{quest.progress >= quest.total ? '완료' : `${quest.progress}/${quest.total}`}
+								</p>
+							</div>
+						{/each}
+					</div>
+				</section>
+			{/if}
+		</div>
+
+		<div class="hidden shrink-0 xl:block">
+			{#if loggedIn}
+				<HomeDashboardPanel />
+			{:else}
+				<GuestHomePanel />
+			{/if}
 		</div>
 	</div>
-</section>
+</div>

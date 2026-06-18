@@ -60,7 +60,7 @@
 	<h2 class="mb-3 text-sm font-semibold">세계관</h2>
 	<div class="flex gap-3 overflow-x-auto pb-2">
 		{#each worlds as world}
-			<WorldCard {world} compact />
+			<WorldCard {world} />
 		{/each}
 	</div>
 </section>

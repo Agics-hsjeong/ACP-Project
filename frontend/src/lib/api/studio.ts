@@ -27,6 +27,7 @@ export async function createStudioCharacter(payload: {
 	memory_summary?: string;
 	avatar?: string;
 	cover?: string;
+	studio_meta?: Record<string, unknown>;
 }): Promise<Character> {
 	const data = await apiFetch<Record<string, unknown>>('/studio/characters/', {
 		method: 'POST',
@@ -53,6 +54,7 @@ export async function patchStudioCharacter(
 		memory_summary: string;
 		avatar: string;
 		cover: string;
+		studio_meta: Record<string, unknown>;
 	}>
 ): Promise<Character> {
 	const data = await apiFetch<Record<string, unknown>>(`/studio/characters/${id}/`, {
@@ -72,16 +74,20 @@ export async function listStudioWorlds(): Promise<World[]> {
 
 export async function patchStudioWorld(
 	id: string,
-	payload: Partial<Pick<World, 'name' | 'genre' | 'characterCount' | 'cover'>>
+	payload: Partial<{
+		name: string;
+		genre: string[];
+		cover: string;
+		studio_meta: Record<string, unknown>;
+	}>
 ): Promise<World> {
-	// backend fields: character_count
 	const data = await apiFetch<Record<string, unknown>>(`/studio/worlds/${id}/`, {
 		method: 'PATCH',
 		json: {
 			...(payload.name !== undefined ? { name: payload.name } : {}),
 			...(payload.genre !== undefined ? { genre: payload.genre } : {}),
 			...(payload.cover !== undefined ? { cover: payload.cover } : {}),
-			...(payload.characterCount !== undefined ? { character_count: payload.characterCount } : {})
+			...(payload.studio_meta !== undefined ? { studio_meta: payload.studio_meta } : {})
 		}
 	});
 	return mapWorld(data);

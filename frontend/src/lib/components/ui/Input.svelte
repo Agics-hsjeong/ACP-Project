@@ -6,7 +6,7 @@
 		error?: string;
 	}
 
-	let { label, error, class: className = '', id, ...rest }: Props = $props();
+	let { label, error, class: className = '', id, value = $bindable(), ...rest }: Props = $props();
 	const inputId = $derived(id ?? label?.replace(/\s/g, '-').toLowerCase());
 </script>
 
@@ -16,6 +16,7 @@
 	{/if}
 	<input
 		id={inputId}
+		bind:value
 		class="h-11 w-full rounded-xl border border-white/10 bg-bg-primary/60 px-4 text-sm text-text-primary placeholder:text-text-muted outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 {error
 			? 'border-accent-red'
 			: ''} {className}"

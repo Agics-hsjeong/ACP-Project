@@ -33,8 +33,6 @@ export const giftPresets = [
 
 let sessions = $state<Record<string, ChatMessage[]>>({});
 
-const streamingTimers = new Map<string, ReturnType<typeof setInterval>>();
-
 let isReplying = $state<Record<string, boolean>>({});
 let apiEnabled = $state(false);
 let apiReady = false;
@@ -112,107 +110,27 @@ function parseUserInput(text: string): ChatMessage[] {
 	];
 }
 
-const replyTemplates = [
-	'…그렇게 말해주니, 조금은 마음이 놓이네요.',
-	'흥미로운 이야기예요. 더 들려주실 수 있나요?',
-	'오늘 밤하늘처럼, 당신의 말도 참 고요하고 따뜻하네요.',
-	'잠시 당신의 말을 곱씹는 듯 눈을 내리깔았다.',
-	'그런 마음… 저도 이해할 수 있어요.'
-];
-
-function pickReply(characterName: string, interaction?: InteractionType): string {
-	if (interaction === 'gift') {
-		return '…정말요? 이런 선물을 받아도 될까요. 마음이 따뜻해지네요.';
-	}
-	if (interaction === 'expression') {
-		return `${characterName}이(가) 당신의 표정에 시선을 맞추며 작게 미소 지었다.`;
-	}
-	if (interaction === 'action') {
-		return `${characterName}이(가) 잠시 망설이다가, 조용히 고개를 끄덕였다.`;
-	}
-	return replyTemplates[Math.floor(Math.random() * replyTemplates.length)];
-}
-
-function streamCharacterReply(
-	characterId: string,
-	characterName: string,
-	interaction?: InteractionType,
-	emotionDelta?: string
-) {
-	const fullText = pickReply(characterName, interaction);
-	const messageId = uuid();
-
-	appendMessages(characterId, [
-		{
-			id: messageId,
-			role: 'character',
-			content: '',
-			isStreaming: true,
-			timestamp: nowTime(),
-			emotionDelta
-		}
-	]);
-
-	setReplying(characterId, true);
-	let index = 0;
-
-	const existing = streamingTimers.get(characterId);
-	if (existing) clearInterval(existing);
-
-	const timer = setInterval(() => {
-		index += 1;
-		const partial = fullText.slice(0, index);
-		updateMessage(characterId, messageId, { content: partial, isStreaming: index < fullText.length });
-
-		if (index >= fullText.length) {
-			clearInterval(timer);
-			streamingTimers.delete(characterId);
-			updateMessage(characterId, messageId, { isStreaming: false });
-			setReplying(characterId, false);
-
-			if (emotionDelta) {
-				const match = emotionDelta.match(/^(애정|신뢰|존경|분노|공포|질투)\s*([+-]?\d+)/);
-				if (match) applyEmotionDelta(match[1], Number(match[2]));
-			}
-		}
-	}, 28);
-
-	streamingTimers.set(characterId, timer);
-}
-
-function triggerReply(
-	characterId: string,
-	characterName: string,
-	interaction?: InteractionType,
-	emotionDelta?: string
-) {
-	setTimeout(() => {
-		streamCharacterReply(characterId, characterName, interaction, emotionDelta);
-	}, 400);
-}
-
 export function getChatMessages(characterId: string): ChatMessage[] {
 	return sessions[characterId] ?? [];
 }
 
-export function sendChatMessage(characterId: string, characterName: string, text: string) {
+export function sendChatMessage(characterId: string, _characterName: string, text: string) {
 	const trimmed = text.trim();
 	if (!trimmed) return;
 
-	if (apiEnabled) {
-		void sendChatMessageViaApi(characterId, trimmed);
+	if (!apiEnabled) {
+		appendMessages(characterId, [
+			{
+				id: uuid(),
+				role: 'system',
+				content: '서버에 연결되어 있지 않습니다. 채팅을 사용할 수 없습니다.',
+				timestamp: nowTime()
+			}
+		]);
 		return;
 	}
 
-	const parsed = parseUserInput(text);
-	if (!parsed.length) return;
-
-	appendMessages(characterId, parsed);
-
-	const last = parsed[parsed.length - 1];
-	if (last.role === 'user' || last.role === 'narration') {
-		triggerReply(characterId, characterName);
-	}
+	void sendChatMessageViaApi(characterId, trimmed);
 }
 
 async function sendChatMessageViaApi(characterId: string, text: string) {
@@ -259,10 +177,22 @@ async function sendChatMessageViaApi(characterId: string, text: string) {
 
 export function sendInteraction(
 	characterId: string,
-	characterName: string,
+	_characterName: string,
 	type: InteractionType,
 	payload: string
 ) {
+	if (!apiEnabled) {
+		appendMessages(characterId, [
+			{
+				id: uuid(),
+				role: 'system',
+				content: '서버에 연결되어 있지 않습니다.',
+				timestamp: nowTime()
+			}
+		]);
+		return;
+	}
+
 	let messages: ChatMessage[] = [];
 	let emotionDelta: string | undefined;
 
@@ -316,22 +246,20 @@ export function sendInteraction(
 			];
 			applyEmotionDelta('신뢰', 3);
 			appendMessages(characterId, messages);
-			if (apiEnabled) {
-				void createMemory({
-					characterId,
-					title: payload,
-					summary: payload,
-					importance: 'high',
-					tags: ['기록']
-				})
-					.then(() => refreshMemories(characterId))
-					.catch(() => undefined);
-			}
+			void createMemory({
+				characterId,
+				title: payload,
+				summary: payload,
+				importance: 'high',
+				tags: ['기록']
+			})
+				.then(() => refreshMemories(characterId))
+				.catch(() => undefined);
 			return;
 	}
 
 	appendMessages(characterId, messages);
-	triggerReply(characterId, characterName, type, emotionDelta);
+	void sendChatMessageViaApi(characterId, messages.map((m) => m.content).join('\n'));
 }
 
 export function isCharacterReplying(characterId: string): boolean {

@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import datetime
+from datetime import date, datetime
 
 from django.contrib.auth import authenticate, get_user_model
 from django.http import StreamingHttpResponse
@@ -40,6 +40,7 @@ from .serializers import (
     RagSearchSerializer,
     RelationshipEdgeSerializer,
     RelationshipEventSerializer,
+    StudioWorldSerializer,
     WorldSerializer,
 )
 from .services import firebase_auth as firebase_service
@@ -450,11 +451,29 @@ class MemoryStatsView(APIView):
         qs = Memory.objects.filter(character_id=character_id)
         archive_count = ArchiveRecord.objects.filter(character_id=character_id).count()
         rag_count = RagChunk.objects.filter(character_id=character_id).count()
+
+        dates = list(qs.values_list('date', flat=True))
+        days_together = 0
+        if dates:
+            days_together = (max(dates) - min(dates)).days + 1
+
+        total_chars = sum(len(m.summary or '') + len(m.detail or '') for m in qs)
+        if total_chars >= 1_000_000:
+            story_volume = f'{total_chars / 1_000_000:.1f}M'
+        elif total_chars >= 1_000:
+            story_volume = f'{total_chars // 1_000}K'
+        else:
+            story_volume = str(total_chars)
+
+        session = ChatSession.objects.filter(character_id=character_id).order_by('created_at').first()
+        if session and not days_together:
+            days_together = max(1, (date.today() - session.created_at.date()).days + 1)
+
         return Response({
             'total': qs.count(),
             'important': qs.filter(importance='high').count(),
-            'days_together': 128,
-            'story_volume': '382K',
+            'days_together': days_together,
+            'story_volume': story_volume,
             'fidelity': min(99, 70 + rag_count * 2),
             'archive_count': archive_count,
             'rag_chunks': rag_count,
@@ -719,7 +738,7 @@ class StudioCharacterViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH'):
             return StudioCharacterSerializer
-        return CharacterSerializer
+        return StudioCharacterSerializer
 
     def get_permissions(self):
         if self.request.method in ('POST', 'PATCH', 'DELETE'):
@@ -737,7 +756,7 @@ class StudioCharacterViewSet(viewsets.ModelViewSet):
 
 class StudioWorldViewSet(viewsets.ModelViewSet):
     queryset = World.objects.all()
-    serializer_class = WorldSerializer
+    serializer_class = StudioWorldSerializer
     lookup_field = 'id'
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 

@@ -38,17 +38,25 @@ export type StudioCharacter = {
 	fewShots: { role: 'user' | 'character'; content: string }[];
 	forbidden: string[];
 	speechPreview: { role: 'user' | 'character'; content: string }[];
+	speechStyle: {
+		tone: string;
+		pattern: string;
+		honorific: string;
+	};
+	memoryRules: {
+		priority: string;
+		retention: string;
+		triggers: string;
+	};
 };
 
 export type WorldTab =
-	| 'overview'
-	| 'nation'
-	| 'faction'
-	| 'location'
-	| 'event'
-	| 'timeline'
-	| 'law'
-	| 'memo';
+	| 'basic'
+	| 'geography'
+	| 'culture'
+	| 'history'
+	| 'rules'
+	| 'preview';
 
 export type WorldFaction = {
 	id: string;
@@ -88,12 +96,69 @@ export type WorldEvent = {
 };
 
 const defaultTraits: PersonalityTrait[] = [
-	{ key: 'extro', label: '외향성', value: 80 },
-	{ key: 'rational', label: '이성', value: 30 },
-	{ key: 'cold', label: '냉담함', value: 25 },
-	{ key: 'caution', label: '신중함', value: 20 },
-	{ key: 'humble', label: '겸손함', value: 70 }
+	{ key: 'extro', label: '외향', value: 50 },
+	{ key: 'rational', label: '이성', value: 50 },
+	{ key: 'cold', label: '냉정', value: 30 },
+	{ key: 'caution', label: '신중', value: 50 },
+	{ key: 'humble', label: '겸손', value: 50 }
 ];
+
+export function defaultCharacterStudioMeta() {
+	return {
+		traits: defaultTraits.map((t) => ({ ...t })),
+		background: {
+			origin: '',
+			goal: '',
+			trauma: '',
+			hidden: ''
+		},
+		fewShots: [
+			{ role: 'user' as const, content: '' },
+			{ role: 'character' as const, content: '' }
+		],
+		forbidden: [
+			'유저를 모욕하거나 비하하지 않는다',
+			'갑작스러운 성격 변화를 하지 않는다',
+			'설정에 없는 능력을 사용하지 않는다'
+		],
+		speechPreview: [
+			{ role: 'user' as const, content: '안녕하세요.' },
+			{ role: 'character' as const, content: '안녕하세요.' }
+		],
+		speechStyle: {
+			tone: '',
+			pattern: '',
+			honorific: ''
+		},
+		memoryRules: {
+			priority: '',
+			retention: '',
+			triggers: ''
+		}
+	};
+}
+
+export function defaultWorldStudioMeta() {
+	return {
+		one_liner: '',
+		description: '',
+		era_setting: '',
+		tech_level: '',
+		magic_system: '',
+		atmosphere: '',
+		map_image: '',
+		gallery: [] as string[],
+		themes: [] as WorldTheme[],
+		eras: [] as WorldEra[],
+		factions: [] as WorldFaction[],
+		nations: [] as WorldNation[],
+		locations: [] as WorldLocation[],
+		cultures: [] as WorldCulture[],
+		events: [] as WorldEvent[],
+		laws: [] as WorldLaw[],
+		memos: [] as WorldMemo[]
+	};
+}
 
 export function toStudioCharacter(c: Character, i = 0): StudioCharacter {
 	return {
@@ -246,15 +311,21 @@ export const worldEvents: WorldEvent[] = [
 ];
 
 export const worldStudioTabs: { id: WorldTab; label: string }[] = [
-	{ id: 'overview', label: '개요' },
-	{ id: 'nation', label: '국가' },
-	{ id: 'faction', label: '세력' },
-	{ id: 'location', label: '장소' },
-	{ id: 'event', label: '사건' },
-	{ id: 'timeline', label: '연대표' },
-	{ id: 'law', label: '절대 법칙' },
-	{ id: 'memo', label: '메모' }
+	{ id: 'basic', label: '기본 설정' },
+	{ id: 'geography', label: '지리·지도' },
+	{ id: 'culture', label: '종족·문화' },
+	{ id: 'history', label: '역사·연표' },
+	{ id: 'rules', label: '규칙·마법' },
+	{ id: 'preview', label: '미리보기' }
 ];
+
+export type WorldCulture = {
+	id: string;
+	name: string;
+	region: string;
+	traits: string;
+	description: string;
+};
 
 export type WorldNation = {
 	id: string;

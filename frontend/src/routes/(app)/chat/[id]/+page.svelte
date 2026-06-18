@@ -15,10 +15,10 @@
 	import ChatEmotionPanel from '$lib/components/chat/ChatEmotionPanel.svelte';
 	import ChatInteractionBar from '$lib/components/chat/ChatInteractionBar.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { Send, Bookmark, MoreHorizontal, Heart } from 'lucide-svelte';
+	import { Send, Bookmark, MoreHorizontal, Heart, ExternalLink } from 'lucide-svelte';
 
 	const characterId = $derived($page.params.id ?? 'elia');
-	const character = $derived(getCatalogCharacter(characterId) ?? getCatalogCharacter('elia')!);
+	const character = $derived(getCatalogCharacter(characterId));
 	let input = $state('');
 
 	onMount(() => {
@@ -26,21 +26,26 @@
 		void loadChatHistory(characterId);
 	});
 
-	const messages = $derived(getChatMessages(character.id));
-	const replying = $derived(isCharacterReplying(character.id));
+	const messages = $derived(character ? getChatMessages(character.id) : []);
+	const replying = $derived(character ? isCharacterReplying(character.id) : false);
 
 	function handleSubmit(e: Event) {
 		e.preventDefault();
-		if (!input.trim() || replying) return;
+		if (!character || !input.trim() || replying) return;
 		sendChatMessage(character.id, character.name, input);
 		input = '';
 	}
 </script>
 
 <svelte:head>
-	<title>{character.name}와의 대화 — ACP</title>
+	<title>{character?.name ?? '채팅'}와의 대화 — ACP</title>
 </svelte:head>
 
+{#if !character}
+	<div class="flex flex-1 items-center justify-center p-8 text-sm text-text-muted">
+		캐릭터를 찾을 수 없습니다.
+	</div>
+{:else}
 <div class="flex h-[calc(100dvh-0px)] lg:h-[calc(100vh-0px)]">
 	<ChatSessionPanel activeId={character.id} />
 
@@ -49,7 +54,9 @@
 			<img src={character.avatar} alt="" class="h-11 w-11 rounded-full border-2 border-primary-500/30 bg-bg-card" />
 			<div class="min-w-0 flex-1">
 				<div class="flex items-center gap-2">
-					<p class="font-semibold">{character.name}</p>
+					<a href="/characters/{character.id}" class="font-semibold hover:text-primary-300">
+						{character.name}
+					</a>
 					<span class="rounded bg-primary-500/20 px-1.5 py-0.5 text-[10px] text-primary-300">✓</span>
 				</div>
 				<p class="truncate text-xs text-text-muted">
@@ -58,6 +65,13 @@
 				</p>
 			</div>
 			<div class="flex items-center gap-1">
+				<a
+					href="/characters/{character.id}"
+					class="rounded-lg p-2 text-text-muted hover:bg-white/5"
+					aria-label="캐릭터 상세"
+				>
+					<ExternalLink class="h-4 w-4" />
+				</a>
 				<button class="rounded-lg p-2 text-text-muted hover:bg-white/5" aria-label="즐겨찾기">
 					<Bookmark class="h-4 w-4" />
 				</button>
@@ -116,3 +130,4 @@
 
 	<ChatEmotionPanel characterId={character.id} />
 </div>
+{/if}

@@ -7,7 +7,7 @@
 	let { value, label = '기억 충실도' }: Props = $props();
 </script>
 
-<div class="rounded-2xl border border-white/10 bg-bg-surface/50 p-5">
+<div>
 	<div class="mb-3 flex items-center justify-between">
 		<h3 class="text-sm font-semibold">{label}</h3>
 		<span class="text-2xl font-bold text-primary-300">{value}%</span>

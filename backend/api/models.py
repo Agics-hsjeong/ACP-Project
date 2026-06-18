@@ -9,6 +9,7 @@ class World(models.Model):
     genre = models.JSONField(default=list)
     character_count = models.PositiveIntegerField(default=0)
     cover = models.URLField(max_length=500)
+    studio_meta = models.JSONField(default=dict, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -43,6 +44,7 @@ class Character(models.Model):
     memory_summary = models.TextField(blank=True)
     avatar = models.URLField(max_length=500)
     cover = models.URLField(max_length=500)
+    studio_meta = models.JSONField(default=dict, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

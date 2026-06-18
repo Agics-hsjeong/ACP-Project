@@ -1,12 +1,11 @@
 <script lang="ts">
-	type PersonalityTrait = { key: string; label: string; value: number };
-
 	interface Props {
-		traits: PersonalityTrait[];
+		traits: { key: string; label: string; value: number }[];
 		readonly?: boolean;
+		onchange?: (key: string, value: number) => void;
 	}
 
-	let { traits, readonly = false }: Props = $props();
+	let { traits, readonly = false, onchange }: Props = $props();
 </script>
 
 <div class="space-y-4">
@@ -27,8 +26,9 @@
 					type="range"
 					min="0"
 					max="100"
-					bind:value={trait.value}
+					value={trait.value}
 					class="mt-1 w-full accent-primary-500"
+					oninput={(e) => onchange?.(trait.key, Number((e.currentTarget as HTMLInputElement).value))}
 				/>
 			{/if}
 		</div>

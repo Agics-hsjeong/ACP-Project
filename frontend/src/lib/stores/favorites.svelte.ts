@@ -5,12 +5,12 @@ const STORAGE_KEY = 'acp-favorites';
 let favoriteIds = $state<string[]>(load());
 
 function load(): string[] {
-	if (!browser) return ['elia'];
+	if (!browser) return [];
 	try {
 		const raw = localStorage.getItem(STORAGE_KEY);
-		return raw ? (JSON.parse(raw) as string[]) : ['elia'];
+		return raw ? (JSON.parse(raw) as string[]) : [];
 	} catch {
-		return ['elia'];
+		return [];
 	}
 }
 

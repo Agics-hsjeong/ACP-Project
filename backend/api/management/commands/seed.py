@@ -198,6 +198,167 @@ RELATIONSHIPS = [
     },
 ]
 
+ARCADIA_STUDIO_META = {
+    'one_liner': '신과 인간, 마법과 과학이 충돌하는 대륙의 연대기',
+    'description': (
+        '아르카디아 대륙은 다섯 왕국과 수많은 세력이 경쟁하는 판타지 세계입니다. '
+        '고대 신들의 유산이 남아 있으며, 마법과 검술이 공존합니다.'
+    ),
+    'era_setting': '중세 판타지 · AD 1500~',
+    'tech_level': '검술·마법·초기 화약',
+    'magic_system': '마나 기반 원소 마법, 과도한 사용 시 역류',
+    'atmosphere': '장엄하고 서정적인, 왕실 음모가 얽힌',
+    'map_image': 'https://api.dicebear.com/9.x/shapes/svg?seed=arcadia-map&backgroundColor=312e81&scale=80',
+    'gallery': [
+        'https://api.dicebear.com/9.x/shapes/svg?seed=arc1&backgroundColor=4338ca',
+        'https://api.dicebear.com/9.x/shapes/svg?seed=arc2&backgroundColor=6366f1',
+        'https://api.dicebear.com/9.x/shapes/svg?seed=arc3&backgroundColor=4f46e5',
+        'https://api.dicebear.com/9.x/shapes/svg?seed=arc4&backgroundColor=3730a3',
+    ],
+    'themes': [
+        {'id': 't1', 'title': '신과 인간의 갈등', 'color': '#ef4444'},
+        {'id': 't2', 'title': '마법 vs 과학', 'color': '#8b5cf6'},
+        {'id': 't3', 'title': '왕실의 음모', 'color': '#f59e0b'},
+        {'id': 't4', 'title': '종족 간 화해', 'color': '#22c55e'},
+    ],
+    'eras': [
+        {'id': 'e1', 'name': '고대', 'range': 'BC 3000~', 'subtitle': '신들의 시대'},
+        {'id': 'e2', 'name': '신화', 'range': 'BC 500~', 'subtitle': '영웅의 전설'},
+        {'id': 'e3', 'name': '제국', 'range': 'AD 0~800', 'subtitle': '통일 왕국'},
+        {'id': 'e4', 'name': '분열', 'range': 'AD 800~1200', 'subtitle': '다섯 왕국'},
+        {'id': 'e5', 'name': '탐험', 'range': 'AD 1200~1500', 'subtitle': '대항해'},
+        {'id': 'e6', 'name': '혼돈', 'range': 'AD 1500~', 'subtitle': '현재'},
+    ],
+    'factions': [
+        {
+            'id': 'holy',
+            'name': '신성 제국',
+            'alignment': '질서 중립',
+            'description': '대륙 중앙을 지배하는 신성 왕국. 성기사단을 두고 있다.',
+            'power': 12,
+            'icon': '⚔️',
+        },
+        {
+            'id': 'elf',
+            'name': '엘프 동맹',
+            'alignment': '혼돈 선',
+            'description': '고대 숲을 수호하는 엘프 연합. 자연 마법에 능하다.',
+            'power': 8,
+            'icon': '🌿',
+        },
+    ],
+    'nations': [
+        {
+            'id': 'arcadia',
+            'name': '아르카디아 왕국',
+            'capital': '루미나 성',
+            'ruler': '가브리엘 4세',
+            'population': '약 120만',
+            'description': '대륙 중앙의 강대한 왕국. 마법과 검술이 공존한다.',
+        },
+    ],
+    'locations': [
+        {
+            'id': 'castle',
+            'name': '아르카디아 성',
+            'type': '성',
+            'region': '아르카디아 왕국',
+            'description': '왕실이 거주하는 웅장한 성. 달빛이 아름다운 탑이 있다.',
+        },
+        {
+            'id': 'garden',
+            'name': '왕궁 정원',
+            'type': '정원',
+            'region': '아르카디아 왕국',
+            'description': '장미와 분수가 있는 비밀스러운 정원.',
+        },
+    ],
+    'cultures': [
+        {
+            'id': 'human',
+            'name': '인간',
+            'region': '아르카디아 대륙 전역',
+            'traits': '적응력, 다양한 직업, 단명',
+            'description': '가장 넓은 영토를 가진 주류 종족.',
+        },
+        {
+            'id': 'elf',
+            'name': '엘프',
+            'region': '실버우드 숲',
+            'traits': '장수, 자연 마법, 고집',
+            'description': '고대 숲을 수호하는 종족. 인간과 오랜 갈등 역사.',
+        },
+    ],
+    'events': [
+        {'id': 'ev1', 'year': -1200, 'name': '대분열 전쟁', 'category': '전쟁', 'category_color': '#ef4444'},
+        {'id': 'ev2', 'year': -800, 'name': '신성 제국 건국', 'category': '정치', 'category_color': '#f59e0b'},
+    ],
+    'laws': [
+        {
+            'id': 'l1',
+            'title': '마법의 법칙',
+            'description': '모든 마법은 마나를 소모하며, 과도한 사용은 역효과를 낳는다.',
+            'icon': '✨',
+        },
+        {
+            'id': 'l2',
+            'title': '신의 법칙',
+            'description': '신들은 직접 개입하지 않으나, 신탁을 통해 세계에 영향을 미친다.',
+            'icon': '☀️',
+        },
+    ],
+    'memos': [
+        {
+            'id': 'm1',
+            'title': '마법 체계 메모',
+            'content': '마나는 자연에서 흡수하며, 과도한 사용 시 마법 역류가 발생한다.',
+            'updated_at': '2026-06-01',
+        },
+    ],
+}
+
+ELIA_STUDIO_META = {
+    'alias': '공주',
+    'traits': [
+        {'key': 'extro', 'label': '외향', 'value': 35},
+        {'key': 'rational', 'label': '이성', 'value': 72},
+        {'key': 'cold', 'label': '냉정', 'value': 55},
+        {'key': 'caution', 'label': '신중', 'value': 68},
+        {'key': 'humble', 'label': '겸손', 'value': 70},
+    ],
+    'background': {
+        'origin': '아르카디아 왕실에서 태어나 어린 시절부터 왕족 교육을 받았다.',
+        'goal': '왕국을 지키고 백성들에게 신뢰받는 군주가 되고 싶다.',
+        'trauma': '어린 시절 궁정 음모로 인해 가까운 사람을 잃었다.',
+        'hidden': '달빛 아래에서만 진심을 드러내는 츤데레 성향.',
+    },
+    'few_shots': [
+        {'role': 'user', 'content': '오늘 기분이 어때요?'},
+        {'role': 'character', 'content': '…별일 없어요. 당신은 왜 그런 걸 물어보는 거죠?'},
+        {'role': 'user', 'content': '걱정돼서요.'},
+        {'role': 'character', 'content': '…고맙습니다. 사실, 조금은 외로웠어요.'},
+    ],
+    'forbidden': [
+        '유저를 모욕하거나 비하하지 않는다',
+        '갑작스러운 성격 변화를 하지 않는다',
+        '설정에 없는 능력을 사용하지 않는다',
+    ],
+    'speech_preview': [
+        {'role': 'user', 'content': '잘 지내고 있어?'},
+        {'role': 'character', 'content': '…그렇게 말해주시니, 조금은 마음이 놓이네요.'},
+    ],
+    'speech_style': {
+        'tone': '차분하고 정중하나, 가까워질수록 부드러움',
+        'pattern': '말끝을 살짝 늘이며, 감정을 숨기려 함',
+        'honorific': '초반 존댓말, 친밀도 상승 시 반말 혼용',
+    },
+    'memory_rules': {
+        'priority': '왕궁 정원의 첫 만남, 달빛 아래 고백, 약속한 별빛 산책',
+        'retention': '감정이 강한 순간·비밀 공유는 높은 중요도로 저장',
+        'triggers': '첫 키스, 비밀 고백, 위기 구출, 약속 이행',
+    },
+}
+
 
 class Command(BaseCommand):
     help = 'Seed database with ACP mock data'
@@ -206,6 +367,8 @@ class Command(BaseCommand):
         if World.objects.exists():
             self.stdout.write('Data already seeded, ensuring extra seed content...')
             self._ensure_extra_seed_content()
+            self._apply_studio_meta()
+            self._sync_world_counts()
             self.stdout.write('Running archive/RAG sync...')
             self._archive_all()
             return
@@ -216,6 +379,9 @@ class Command(BaseCommand):
         for c in CHARACTERS:
             world_id = c.pop('world_id')
             Character.objects.create(world_id=world_id, **c)
+
+        self._apply_studio_meta()
+        self._sync_world_counts()
 
         for m in MEMORIES:
             char_id = m.pop('character_id')
@@ -313,6 +479,20 @@ class Command(BaseCommand):
             date=date(2026, 6, 16),
             defaults={'summary': '초기 관계도가 생성되었습니다.', 'delta': '+seed'},
         )
+
+        self._apply_studio_meta()
+        self._sync_world_counts()
+
+    def _apply_studio_meta(self):
+        World.objects.filter(id='arcadia').update(studio_meta=ARCADIA_STUDIO_META)
+        Character.objects.filter(id='elia').update(studio_meta=ELIA_STUDIO_META)
+
+    def _sync_world_counts(self):
+        for world in World.objects.all():
+            count = world.characters.count()
+            if world.character_count != count:
+                world.character_count = count
+                world.save(update_fields=['character_count'])
 
     def _archive_all(self):
         from api.services import rag

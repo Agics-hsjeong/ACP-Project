@@ -3,7 +3,7 @@
 	import {
 		getRelationshipGraph,
 		getRelationshipHistory
-	} from '$lib/stores/catalog.svelte';
+	} from '$lib/stores/relationship.svelte';
 	import RelationshipTimeline from '$lib/components/relationship/RelationshipTimeline.svelte';
 
 	let selectedId = $state('elia');
@@ -11,7 +11,12 @@
 	const graphData = $derived(getRelationshipGraph());
 	const graphNodes = $derived(graphData.nodes);
 	const graphEdges = $derived(graphData.edges);
-	const relationshipHistory = $derived(getRelationshipHistory());
+	const relationshipHistory = $derived(
+		getRelationshipHistory().map((h) => ({
+			...h,
+			id: String(h.id ?? `${h.date}-${h.title}`)
+		}))
+	);
 
 	const arcadiaNodes = $derived(
 		graphNodes.filter((n) => (n.worldId ?? graphData.worlds[0]?.id) === 'arcadia' || n.isCenter)

@@ -17,7 +17,13 @@ from .models import (
 class WorldSerializer(serializers.ModelSerializer):
     class Meta:
         model = World
-        fields = ['id', 'name', 'genre', 'character_count', 'cover']
+        fields = ['id', 'name', 'genre', 'character_count', 'cover', 'studio_meta']
+
+
+class StudioWorldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = World
+        fields = ['id', 'name', 'genre', 'character_count', 'cover', 'studio_meta']
 
 
 class CharacterSerializer(serializers.ModelSerializer):
@@ -189,7 +195,7 @@ class ChatSendSerializer(serializers.Serializer):
 class StudioCharacterSerializer(serializers.ModelSerializer):
     """스튜디오용: world_id를 입력으로 허용."""
 
-    world_id = serializers.SlugField(write_only=True)
+    world_id = serializers.SlugField(write_only=True, required=False)
     world_name = serializers.CharField(source='world.name', read_only=True)
 
     class Meta:
@@ -214,7 +220,24 @@ class StudioCharacterSerializer(serializers.ModelSerializer):
             'memory_summary',
             'avatar',
             'cover',
+            'studio_meta',
         ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['world_id'] = instance.world_id
+        return data
+
+    def create(self, validated_data):
+        world_id = validated_data.pop('world_id', 'arcadia')
+        world = World.objects.get(pk=world_id)
+        return Character.objects.create(world=world, **validated_data)
+
+    def update(self, instance, validated_data):
+        world_id = validated_data.pop('world_id', None)
+        if world_id:
+            instance.world = World.objects.get(pk=world_id)
+        return super().update(instance, validated_data)
 
 
 class LandingContentSerializer(serializers.ModelSerializer):

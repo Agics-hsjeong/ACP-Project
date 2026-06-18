@@ -6,9 +6,10 @@
 		characters: Character[];
 		selectedId: string;
 		onselect: (id: string) => void;
+		oncreate?: () => void;
 	}
 
-	let { characters, selectedId, onselect }: Props = $props();
+	let { characters, selectedId, onselect, oncreate }: Props = $props();
 	let query = $state('');
 
 	const filtered = $derived(
@@ -42,6 +43,7 @@
 				type="button"
 				class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-primary-600/20 text-primary-300 hover:bg-primary-600/30"
 				aria-label="새 캐릭터"
+				onclick={() => oncreate?.()}
 			>
 				<Plus class="h-4 w-4" />
 			</button>
@@ -61,9 +63,11 @@
 				<img src={char.avatar} alt="" class="h-10 w-10 rounded-full bg-bg-card object-cover" />
 				<div class="min-w-0 flex-1">
 					<p class="truncate text-sm font-medium">{char.name}</p>
-					<p class="truncate text-[10px] text-text-muted">{char.worldName}</p>
+					<p class="truncate text-[10px] text-text-muted">{char.world}</p>
 				</div>
 			</button>
+		{:else}
+			<p class="px-2 py-4 text-center text-xs text-text-muted">캐릭터가 없습니다.</p>
 		{/each}
 	</div>
 </aside>

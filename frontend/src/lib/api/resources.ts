@@ -150,7 +150,8 @@ export function mapCharacter(raw: Record<string, unknown>): Character {
 		quote: raw.quote ? String(raw.quote) : undefined,
 		memorySummary: raw.memory_summary ? String(raw.memory_summary) : undefined,
 		avatar: String(raw.avatar ?? ''),
-		cover: String(raw.cover ?? '')
+		cover: String(raw.cover ?? ''),
+		studioMeta: (raw.studio_meta as Record<string, unknown>) ?? undefined
 	};
 }
 
@@ -160,7 +161,8 @@ export function mapWorld(raw: Record<string, unknown>): World {
 		name: String(raw.name),
 		genre: (raw.genre as string[]) ?? [],
 		characterCount: Number(raw.characterCount ?? raw.character_count ?? 0),
-		cover: String(raw.cover ?? '')
+		cover: String(raw.cover ?? ''),
+		studioMeta: (raw.studio_meta as Record<string, unknown>) ?? undefined
 	};
 }
 

@@ -20,6 +20,7 @@ export type Character = {
 	memorySummary?: string;
 	avatar: string;
 	cover: string;
+	studioMeta?: Record<string, unknown>;
 };
 
 export type World = {
@@ -28,6 +29,7 @@ export type World = {
 	genre: string[];
 	characterCount: number;
 	cover: string;
+	studioMeta?: Record<string, unknown>;
 };
 
 export type ChatMessage = {

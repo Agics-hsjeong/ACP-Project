@@ -56,19 +56,11 @@ export function parseEmotionDelta(text: string): { label: string; delta: number 
 }
 
 export function getEmotionTrend() {
-	const affection = emotionState.find((e) => e.key === 'affection')?.value ?? 50;
-	const trust = emotionState.find((e) => e.key === 'trust')?.value ?? 50;
-	const anger = emotionState.find((e) => e.key === 'anger')?.value ?? 20;
-	const len = 14;
-	return Array.from({ length: len }, (_, i) => {
-		const t = i / (len - 1);
-		return {
-			day: i + 1,
-			affection: Math.round(affection - (1 - t) * 18 + Math.sin(i) * 2),
-			trust: Math.round(trust - (1 - t) * 15 + Math.cos(i) * 2),
-			anger: Math.round(anger + (1 - t) * 6 - Math.sin(i * 2) * 2)
-		};
-	});
+	if (!emotionState.length) return [];
+	const affection = emotionState.find((e) => e.key === 'affection')?.value ?? 0;
+	const trust = emotionState.find((e) => e.key === 'trust')?.value ?? 0;
+	const anger = emotionState.find((e) => e.key === 'anger')?.value ?? 0;
+	return [{ day: 1, affection, trust, anger }];
 }
 
 export async function refreshEmotion(characterId = activeCharacterId) {

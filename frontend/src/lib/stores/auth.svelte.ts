@@ -3,6 +3,7 @@ import { goto } from '$app/navigation';
 import { fetchMe, loginApi, loginWithFirebaseToken, type AuthUser } from '$lib/api/auth';
 import { apiHealth } from '$lib/api/client';
 import { setAuthToken } from '$lib/api/config';
+import { getLoginUrl } from '$lib/auth/access';
 import { isFirebaseConfigured, mapFirebaseAuthError, signInWithGoogle } from '$lib/firebase/client';
 
 const STORAGE_KEY = 'acp-auth';
@@ -40,9 +41,7 @@ export function login(email: string, password?: string) {
 
 export async function loginWithApi(email: string, password?: string, provider?: string) {
 	if (!(await apiHealth())) {
-		if (provider) loginSocial(provider);
-		else login(email, password);
-		return;
+		throw new Error('서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.');
 	}
 	const apiUser = await loginApi(email, password, provider);
 	user = apiUser;
@@ -74,8 +73,13 @@ export function logout() {
 	setAuthToken(null);
 }
 
-export async function requireAuth(redirectTo = '/login') {
-	if (!user) await goto(redirectTo);
+export async function requireAuth(redirectTo?: string) {
+	if (!user) await goto(getLoginUrl(redirectTo));
+}
+
+export function redirectToLogin(returnPath: string) {
+	if (!browser) return;
+	goto(getLoginUrl(returnPath));
 }
 
 export async function restoreSession(): Promise<void> {

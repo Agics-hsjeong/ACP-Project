@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import * as d3 from 'd3';
 	import { edgeStyles } from '$lib/data/relationship';
-	import { getRelationshipGraph } from '$lib/stores/catalog.svelte';
+	import { getRelationshipGraph } from '$lib/stores/relationship.svelte';
 
 	interface Props {
 		centerId?: string;
@@ -16,12 +15,15 @@
 	const width = 240;
 	const height = 160;
 
-	onMount(() => {
+	const graphSnapshot = $derived(getRelationshipGraph());
+
+	$effect(() => {
 		if (!browser || !container) return;
 
-		const { nodes: graphNodes, edges: graphEdges } = getRelationshipGraph();
+		const { nodes: graphNodes, edges: graphEdges } = graphSnapshot;
 		const center = graphNodes.find((n) => n.id === centerId) ?? graphNodes[0];
-		if (!center) return;
+		if (!center || graphNodes.length === 0) return;
+
 		const connectedIds = new Set<string>([center.id]);
 		const localEdges = graphEdges.filter((e) => {
 			if (e.source === center.id || e.target === center.id) {
@@ -46,6 +48,8 @@
 		const simLinks: SimLink[] = localEdges
 			.filter((e) => nodeById.has(e.source) && nodeById.has(e.target))
 			.map((e) => ({ ...e, source: nodeById.get(e.source)!, target: nodeById.get(e.target)! }));
+
+		d3.select(container).selectAll('*').remove();
 
 		const svg = d3
 			.select(container)
